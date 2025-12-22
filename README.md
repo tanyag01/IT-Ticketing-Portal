@@ -5,31 +5,34 @@ A full-stack IT Ticketing Management System built with Flask to streamline inter
 The system enables employees to raise IT support tickets, track progress, and communicate with IT teams, while administrators can manage users, tickets, priorities, and reports from a centralized dashboard.
 
 🚀 Features
-👤 User Features
-Secure user registration & login
-Raise IT support tickets
-Track ticket status (Open / In Progress / Resolved)
-Upload attachments (PDFs, images)
-View ticket history and updates
+### 👤 User Features
+- Secure user registration & login
+- Raise IT support tickets
+- Track ticket status (Open / In Progress / Resolved)
+- Upload attachments (PDFs, images)
+- View ticket history and updates
 
-🛠️ Admin Features
-Admin dashboard with ticket statistics
-View and manage all tickets
-Update ticket status and priority
-Manage users and roles
-Generate reports (CSV)
-Role-based access control
+### 🛠️ Admin Features
+- Admin dashboard with ticket statistics
+- View and manage all tickets
+- Update ticket status and priority
+- Manage users and roles
+- Generate reports (CSV)
+- Role-based access control
+  
+## 🧰 Tech Stack
 
-🧰 Tech Stack
-Layer	Technology
-Backend	Python, Flask
-Database	SQLite (upgradeable to PostgreSQL / MySQL)
-ORM	SQLAlchemy
-Frontend	HTML, CSS, Bootstrap
-Authentication	Flask-Login
-Migrations	Flask-Migrate
-Deployment	Gunicorn + Cloudflare
-Version Control	Git & GitHub
+| Layer | Technology |
+|------|-----------|
+| Backend | Python, Flask |
+| Database | SQLite (upgradeable to PostgreSQL / MySQL) |
+| ORM | SQLAlchemy |
+| Frontend | HTML, CSS, Bootstrap |
+| Authentication | Flask-Login |
+| Migrations | Flask-Migrate |
+| Deployment | Gunicorn + Cloudflare |
+| Version Control | Git & GitHub |
+
 📂 Project Structure
 IT-Ticketing-Portal/
 │
@@ -85,6 +88,8 @@ Sensitive files (.env, database files, uploads) are excluded via .gitignore
 Passwords are securely hashed
 Role-based authorization enforced across the app
 Production deployment should use a WSGI server (Gunicorn)
+⚠️ Do not use the Flask development server in production.
+
 
 🚧 Notes & Limitations
 Virtual environments (venv, .venv) are intentionally excluded from the repository
