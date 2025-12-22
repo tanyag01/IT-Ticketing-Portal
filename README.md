@@ -1,47 +1,104 @@
-# IT Ticketing Portal (Cleaned)
+🎫 IT Ticketing Portal
 
-This archive is a cleaned, runnable copy of the **IT Ticketing Portal** project.
-I removed bundled virtual environments and temporary __pycache__ files to keep the package lightweight.
+A full-stack IT Ticketing Management System built with Flask to streamline internal IT support operations within an organization.
 
-## What's included
-- backend/ : Flask application (app.py, templates, static, models, etc.)
-- requirements.txt : Python dependencies for the backend
+The system enables employees to raise IT support tickets, track progress, and communicate with IT teams, while administrators can manage users, tickets, priorities, and reports from a centralized dashboard.
 
-## To run locally (recommended)
-1. Create a Python virtual environment (Python 3.11+ recommended):
-   ```bash
-   python -m venv .venv
-   source .venv/bin/activate   # macOS/Linux
-   .venv\Scripts\activate    # Windows PowerShell
-   ```
+🚀 Features
+👤 User Features
+Secure user registration & login
+Raise IT support tickets
+Track ticket status (Open / In Progress / Resolved)
+Upload attachments (PDFs, images)
+View ticket history and updates
 
-2. Install dependencies:
-   ```bash
-   pip install -r backend/requirements.txt
-   ```
+🛠️ Admin Features
+Admin dashboard with ticket statistics
+View and manage all tickets
+Update ticket status and priority
+Manage users and roles
+Generate reports (CSV)
+Role-based access control
 
-3. Set environment variables (optional) or edit `config.py`:
-   - `FLASK_APP=app.py`
-   - `FLASK_ENV=development`
+🧰 Tech Stack
+Layer	Technology
+Backend	Python, Flask
+Database	SQLite (upgradeable to PostgreSQL / MySQL)
+ORM	SQLAlchemy
+Frontend	HTML, CSS, Bootstrap
+Authentication	Flask-Login
+Migrations	Flask-Migrate
+Deployment	Gunicorn + Cloudflare
+Version Control	Git & GitHub
+📂 Project Structure
+IT-Ticketing-Portal/
+│
+├── backend/
+│   ├── app.py
+│   ├── config.py
+│   ├── models.py
+│   ├── forms.py
+│   ├── utils.py
+│   ├── tasks.py
+│   ├── db_init.py
+│   ├── requirements.txt
+│   ├── migrations/
+│   ├── templates/
+│   └── static/
+│
+├── .gitignore
+└── README.md
 
-4. Initialize database (if needed):
-   ```bash
-   python backend/db_init.py
-   ```
+⚙️ Local Installation & Setup
+1️⃣ Clone the repository
+git clone https://github.com/tanyag01/IT-Ticketing-Portal.git
+cd IT-Ticketing-Portal
 
-5. Run:
-   ```bash
-   cd backend
-   flask run
-   ```
+2️⃣ Create and activate virtual environment
+python -m venv .venv
+.venv\Scripts\activate   # Windows PowerShell
+# source .venv/bin/activate   # macOS/Linux
 
-## UI tweaks
-- Header now has a blue gradient and improved card shadows.
-- Added a small favicon.
-- Minor responsive improvements for sidebar.
+3️⃣ Install dependencies
+pip install -r backend/requirements.txt
 
-## Notes / Limitations
-- I removed the `venv` and `.venv` folders that were bundled; please recreate one locally as shown above.
-- I made modest UI updates (style.css + layout.html + favicon). I did NOT change major app logic or add new features beyond visual polish.
-- If you'd like specific feature changes (export formats, auth, APIs, or exact UI mockups) tell me and I will modify files accordingly.
+4️⃣ Initialize the database (first time only)
+python backend/db_init.py
+
+5️⃣ Run the application
+cd backend
+flask run
+
+
+Access the application at:
+👉 http://127.0.0.1:5000
+
+🎨 UI Enhancements
+Clean blue gradient header
+Improved card shadows and spacing
+Responsive sidebar layout
+Added favicon
+Minor UI polish (no core logic changes)
+
+🔐 Security Notes
+Sensitive files (.env, database files, uploads) are excluded via .gitignore
+Passwords are securely hashed
+Role-based authorization enforced across the app
+Production deployment should use a WSGI server (Gunicorn)
+
+🚧 Notes & Limitations
+Virtual environments (venv, .venv) are intentionally excluded from the repository
+SQLite is used for development; production should use PostgreSQL or MySQL
+This version focuses on stability and clarity rather than feature expansion
+
+🌱 Future Enhancements
+Email notifications
+SLA & priority automation
+Ticket assignment to engineers
+API support
+Analytics dashboard
+
+👩‍💻 Author
+Tanya Gupta
+IT Ticketing Portal — Full-Stack Flask Project
 
