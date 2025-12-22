@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}{{ title if title else "IT Ticketing Portal" }}{% endblock %}</title>
+
+  <!-- Fonts / Icons / Bootstrap -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+
+  <!-- Favicon -->
+  <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}" />
+
+  <!-- Theme preference -->
+  <meta name="user-theme" content="{{ current_user.theme_pref if (current_user is defined and current_user.is_authenticated and current_user.theme_pref) else '' }}">
+
+  {% block head %}{% endblock %}
+
+  <style>
+    :root {
+      --brand: #1e40af;
+      --brand-light: #3b82f6;
+      --brand-accent: #10b981;
+      --card-radius: 16px;
+      --transition: all 0.3s ease;
+
+      /* Dark mode */
+      --bg: #0f172a;
+      --bg-soft: #1e293b;
+      --bg-card: #1e293b;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --border: rgba(255, 255, 255, 0.1);
+      --shadow: rgba(0, 0, 0, 0.5);
+
+      /* Light mode */
+      --l-bg: #f8fafc;
+      --l-bg-soft: #ffffff;
+      --l-bg-card: #ffffff;
+      --l-text: #0f172a;
+      --l-text-muted: #64748b;
+      --l-border: #e2e8f0;
+      --l-shadow: rgba(0, 0, 0, 0.1);
+    }
+
+    [data-theme="dark"] {
+      --bg-main: var(--bg);
+      --bg-surface: var(--bg-soft);
+      --bg-card-final: var(--bg-card);
+      --text-main: var(--text);
+      --text-muted-final: var(--text-muted);
+      --border-final: var(--border);
+      --shadow-final: var(--shadow);
+    }
+
+    [data-theme="light"] {
+      --bg-main: var(--l-bg);
+      --bg-surface: var(--l-bg-soft);
+      --bg-card-final: var(--l-bg-card);
+      --text-main: var(--l-text);
+      --text-muted-final: var(--l-text-muted);
+      --border-final: var(--l-border);
+      --shadow-final: var(--l-shadow);
+    }
+
+    * {
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      background: var(--bg-main);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--text-main);
+    }
+
+    body {
+      background: var(--bg-main);
+      background-image: 
+        linear-gradient(135deg, rgba(30, 64, 175, 0.03) 0%, rgba(16, 185, 129, 0.03) 100%),
+        repeating-linear-gradient(
+          45deg,
+          transparent,
+          transparent 40px,
+          rgba(30, 64, 175, 0.015) 40px,
+          rgba(30, 64, 175, 0.015) 80px
+        );
+      background-attachment: fixed;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600px;
+      height: 600px;
+      background-image: url("{{ url_for('static', filename='images/logo.png') }}");
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      opacity: 0.02;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    [data-theme="dark"] body::before {
+      opacity: 0.03;
+      filter: brightness(1.5);
+    }
+
+    /* Topbar */
+    .topbar {
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .brand {
+      font-weight: 700;
+      font-size: 22px;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      letter-spacing: -0.03em;
+    }
+
+    .brand-logo {
+      width: 50px;
+      height: 50px;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: white;
+      font-size: 26px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .brand-logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      padding: 6px;
+    }
+
+    .topbar-controls {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .theme-btn, .notification-bell {
+      border: none;
+      background: rgba(255, 255, 255, 0.15);
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      font-size: 18px;
+      cursor: pointer;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      position: relative;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .theme-btn:hover, .notification-bell:hover {
+      background: rgba(255, 255, 255, 0.25);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Notification Badge */
+    .notification-badge {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+      color: white !important;
+      font-size: 10px !important;
+      font-weight: 700 !important;
+      min-width: 22px !important;
+      height: 22px !important;
+      border-radius: 50% !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      border: 2px solid #1e40af !important;
+      animation: pulse 2s infinite !important;
+      padding: 0 !important;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+      50% {
+        transform: scale(1.12);
+        opacity: 0.85;
+      }
+    }
+
+    .notification-dropdown {
+      position: absolute;
+      top: 55px;
+      right: 0;
+      width: 380px;
+      max-height: 500px;
+      background: var(--bg-card-final);
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+      border: 1px solid var(--border-final);
+      display: none;
+      z-index: 1000;
+      overflow: hidden;
+      animation: slideDown 0.3s ease;
+      flex-direction: column;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .notification-dropdown.show {
+      display: flex;
+    }
+
+    .notification-dropdown-header {
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--border-final);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--bg-surface);
+    }
+
+    .notification-dropdown-header h4 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .notification-mark-read {
+      font-size: 12px;
+      color: #1e40af;
+      cursor: pointer;
+      font-weight: 600;
+      padding: 4px 8px;
+      border-radius: 4px;
+      transition: all 0.2s ease;
+    }
+
+    .notification-mark-read:hover {
+      background: rgba(30, 64, 175, 0.1);
+      text-decoration: underline;
+    }
+
+    .notification-list {
+      max-height: 420px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .notification-item {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border-final);
+      cursor: pointer;
+      transition: background 0.2s ease;
+      display: flex;
+      gap: 12px;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .notification-item:hover {
+      background: var(--bg-surface);
+    }
+
+    .notification-item:last-child {
+      border-bottom: none;
+    }
+
+    .notification-icon-wrapper {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+      background: rgba(30, 64, 175, 0.1);
+      color: #1e40af;
+    }
+
+    .notification-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .notification-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-main);
+      margin: 0 0 4px;
+      word-break: break-word;
+    }
+
+    .notification-message {
+      font-size: 12px;
+      color: var(--text-muted-final);
+      margin: 0;
+      line-height: 1.4;
+      word-break: break-word;
+    }
+
+    .notification-empty {
+      padding: 50px 20px;
+      text-align: center;
+      color: var(--text-muted-final);
+    }
+
+    .notification-empty p {
+      margin: 0;
+      font-size: 14px;
+    }
+
+    .notification-close-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: none;
+      border: none;
+      font-size: 20px;
+      color: var(--text-muted-final);
+      cursor: pointer;
+      opacity: 0.6;
+      transition: opacity 0.2s ease;
+      z-index: 10;
+    }
+
+    .notification-close-btn:hover {
+      opacity: 1;
+    }
+
+    /* Sidebar - Modern Design */
+    .sidebar {
+      width: 280px;
+      position: fixed;
+      left: 0;
+      top: 70px;
+      bottom: 0;
+      background: var(--bg-card-final);
+      padding: 24px 18px;
+      overflow-y: auto;
+      border-right: 1px solid var(--border-final);
+      transition: transform 0.3s ease;
+      z-index: 90;
+      box-shadow: 2px 0 8px var(--shadow-final);
+    }
+
+    .sidebar a {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 18px;
+      color: var(--text-muted-final);
+      text-decoration: none;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      margin-bottom: 6px;
+      position: relative;
+    }
+
+    .sidebar a:hover {
+      color: var(--text-main);
+      background: var(--bg-main);
+      transform: translateX(4px);
+    }
+
+    .sidebar a.active {
+      color: var(--brand);
+      background: linear-gradient(135deg, rgba(30, 64, 175, 0.12), rgba(30, 64, 175, 0.08));
+      font-weight: 600;
+    }
+
+    .sidebar a.active::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: var(--brand);
+      border-radius: 0 4px 4px 0;
+    }
+
+    .sidebar a i {
+      width: 22px;
+      text-align: center;
+      font-size: 18px;
+    }
+
+    /* Main Content */
+    .main-content {
+      margin-left: 280px;
+      padding: 28px;
+      flex: 1;
+      transition: margin-left 0.3s ease;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Card */
+    .card {
+      background: var(--bg-card-final);
+      border-radius: var(--card-radius);
+      border: 1px solid var(--border-final);
+      padding: 28px;
+      box-shadow: 0 2px 8px var(--shadow-final);
+      margin-bottom: 28px;
+      transition: all 0.3s ease;
+    }
+
+    .card:hover {
+      box-shadow: 0 8px 24px var(--shadow-final);
+      transform: translateY(-2px);
+    }
+
+    /* Forms */
+    .form-control,
+    .form-select {
+      background: var(--bg-card-final) !important;
+      border: 1.5px solid var(--border-final) !important;
+      color: var(--text-main) !important;
+      border-radius: 10px;
+      padding: 13px 16px;
+      font-size: 14px;
+      transition: all 0.2s ease;
+    }
+
+    .form-control::placeholder {
+      color: var(--text-muted-final) !important;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+      background: var(--bg-card-final) !important;
+      border-color: var(--brand) !important;
+      color: var(--text-main) !important;
+      box-shadow: 0 0 0 4px rgba(30, 64, 175, 0.1);
+    }
+
+    .form-label {
+      color: var(--text-main);
+      font-weight: 600;
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
+
+    /* Buttons */
+    .btn-primary {
+      background: linear-gradient(135deg, var(--brand), #1e3a8a);
+      border: none;
+      color: white;
+      font-weight: 600;
+      padding: 12px 24px;
+      border-radius: 10px;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #1e3a8a, var(--brand));
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(30, 64, 175, 0.4);
+    }
+
+    /* Alerts */
+    .alert {
+      border-radius: 12px;
+      border-left: 4px solid;
+      font-weight: 500;
+      padding: 16px 18px;
+      animation: slideInLeft 0.4s ease;
+    }
+
+    @keyframes slideInLeft {
+      from { opacity: 0; transform: translateX(-20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .alert-success {
+      background: #d1fae5;
+      color: #065f46;
+      border-color: #10b981;
+    }
+
+    .alert-danger {
+      background: #fee2e2;
+      color: #991b1b;
+      border-color: #ef4444;
+    }
+
+    /* Tables */
+    .table {
+      color: var(--text-main);
+      margin-bottom: 0;
+    }
+
+    .table th {
+      font-weight: 600;
+      color: var(--text-main);
+      padding: 16px;
+      border-bottom: 2px solid var(--border-final);
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background: var(--bg-surface);
+    }
+
+    .table td {
+      padding: 16px;
+      border-bottom: 1px solid var(--border-final);
+      font-size: 14px;
+    }
+
+    .table tbody tr {
+      transition: all 0.2s ease;
+    }
+
+    .table tbody tr:hover {
+      background: rgba(30, 64, 175, 0.04);
+    }
+
+    /* Footer - Professional Design */
+    footer {
+      background: var(--bg-card-final);
+      border-top: 2px solid var(--border-final);
+      padding: 24px 28px;
+      text-align: center;
+      color: var(--text-muted-final);
+      font-size: 14px;
+      margin-top: auto;
+      box-shadow: 0 -4px 12px var(--shadow-final);
+      position: relative;
+      z-index: 1;
+    }
+
+    footer p {
+      margin: 0 0 8px;
+      line-height: 1.5;
+    }
+
+    footer p:last-child {
+      margin-bottom: 0;
+    }
+
+    footer a {
+      color: var(--brand);
+      text-decoration: none;
+      font-weight: 700;
+      transition: all 0.2s ease;
+    }
+
+    footer a:hover {
+      color: var(--brand-light);
+      text-decoration: underline;
+    }
+
+    /* User info in topbar */
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #ffffff;
+      font-size: 14px;
+      font-weight: 500;
+      padding: 8px 16px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .user-info i {
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    /* Toast */
+    #toast {
+      position: fixed;
+      right: 28px;
+      bottom: 28px;
+      background: var(--bg-card-final);
+      color: var(--text-main);
+      padding: 18px 22px;
+      border-radius: 12px;
+      display: none;
+      z-index: 5000;
+      box-shadow: 0 12px 28px var(--shadow-final);
+      border: 1px solid var(--border-final);
+      min-width: 280px;
+      font-weight: 500;
+    }
+
+    #toast.show {
+      display: block;
+      animation: toastSlide 2.8s ease forwards;
+    }
+
+    @keyframes toastSlide {
+      0% { opacity: 0; transform: translateY(30px); }
+      10% { opacity: 1; transform: translateY(0); }
+      90% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(30px); }
+    }
+
+    /* Scrollbar styling */
+    ::-webkit-scrollbar {
+      width: 12px;
+      height: 12px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg-main);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border-final);
+      border-radius: 6px;
+      border: 2px solid var(--bg-main);
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--text-muted-final);
+    }
+
+    /* Mobile */
+    @media (max-width: 900px) {
+      .sidebar {
+        transform: translateX(-100%);
+        z-index: 99;
+      }
+
+      .sidebar.mobile-open {
+        transform: translateX(0);
+      }
+
+      .main-content {
+        margin-left: 0 !important;
+      }
+
+      .brand span {
+        display: none;
+      }
+
+      #sidebarToggle {
+        display: flex !important;
+      }
+
+      .topbar {
+        padding: 0 18px;
+        height: 64px;
+      }
+
+      .user-info span {
+        display: none;
+      }
+    }
+
+    @media (min-width: 901px) {
+      .sidebar {
+        display: block !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Topbar -->
+  <nav class="topbar" role="navigation" aria-label="Topbar">
+    <div class="d-flex align-items-center gap-3">
+      {% if current_user.is_authenticated %}
+      <button id="sidebarToggle" class="theme-btn" aria-label="Toggle sidebar" style="display: none;">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+      {% endif %}
+      <div class="brand" aria-label="IT Ticketing Portal">
+        <div class="brand-logo">
+          <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+          <span style="display: none;">⚙️</span>
+        </div>
+        <span>IT Ticketing Portal</span>
+      </div>
+    </div>
+
+    <div class="topbar-controls">
+      {% if current_user.is_authenticated %}
+      
+      <!-- Notification Bell -->
+      <div style="position: relative;">
+        <button id="notificationBell" class="notification-bell" aria-label="Notifications" title="Notifications">
+          <i class="fa-solid fa-bell"></i>
+          <span id="notificationBadge" class="notification-badge" style="display: none;">0</span>
+        </button>
+        <div id="notificationDropdown" class="notification-dropdown">
+          <button class="notification-close-btn" onclick="closeNotificationDropdown()">
+            <i class="fa-solid fa-times"></i>
+          </button>
+          <div class="notification-dropdown-header">
+            <h4>Notifications</h4>
+            <span id="markAsReadBtn" class="notification-mark-read" onclick="clearNotifications()">Mark as read</span>
+          </div>
+          <div id="notificationList" class="notification-list">
+            <div class="notification-empty">
+              <p>No notifications</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Theme Toggle -->
+      <button id="themeToggle" class="theme-btn" aria-label="Toggle theme" title="Toggle theme">
+        🌙
+      </button>
+
+      <!-- User Info -->
+      <span class="user-info d-none d-sm-flex">
+        <i class="fa-solid fa-user-circle"></i>
+        <span>{{ current_user.name }}</span>
+      </span>
+
+      <!-- Logout -->
+      <a href="{{ url_for('logout') }}" class="theme-btn" title="Logout" aria-label="Logout">
+        <i class="fa-solid fa-right-from-bracket"></i>
+      </a>
+      {% else %}
+      <a href="{{ url_for('login') }}" class="btn btn-sm btn-outline-light">Login</a>
+      <a href="{{ url_for('register') }}" class="btn btn-sm btn-light">Register</a>
+      {% endif %}
+    </div>
+  </nav>
+
+  <!-- Sidebar -->
+  {% if current_user.is_authenticated %}
+  <aside id="sidebar" class="sidebar" role="navigation" aria-label="Main navigation">
+    {% if current_user.role == 'admin' %}
+    <a href="{{ url_for('admin_dashboard') }}" class="{{ 'active' if request.endpoint == 'admin_dashboard' else '' }}">
+      <i class="fa-solid fa-chart-line"></i>
+      <span>Dashboard</span>
+    </a>
+    <a href="{{ url_for('admin_users') }}" class="{{ 'active' if request.endpoint == 'admin_users' else '' }}">
+      <i class="fa-solid fa-users"></i>
+      <span>Users</span>
+    </a>
+    <a href="{{ url_for('admin_tickets') }}" class="{{ 'active' if request.endpoint == 'admin_tickets' else '' }}">
+      <i class="fa-solid fa-ticket"></i>
+      <span>All Tickets</span>
+    </a>
+    <a href="{{ url_for('reports') }}" class="{{ 'active' if request.endpoint == 'reports' else '' }}">
+      <i class="fa-solid fa-file-lines"></i>
+      <span>Reports</span>
+    </a>
+    <a href="{{ url_for('settings') }}" class="{{ 'active' if request.endpoint == 'settings' else '' }}">
+      <i class="fa-solid fa-envelope"></i>
+      <span>Settings</span>
+    </a>
+    {% else %}
+    <a href="{{ url_for('user_dashboard') }}" class="{{ 'active' if request.endpoint == 'user_dashboard' else '' }}">
+      <i class="fa-solid fa-house"></i>
+      <span>My Dashboard</span>
+    </a>
+    <a href="{{ url_for('create_ticket') }}" class="{{ 'active' if request.endpoint == 'create_ticket' else '' }}">
+      <i class="fa-solid fa-circle-plus"></i>
+      <span>Raise Ticket</span>
+    </a>
+    <a href="{{ url_for('settings') }}" class="{{ 'active' if request.endpoint == 'settings' else '' }}">
+      <i class="fa-solid fa-envelope"></i>
+      <span>Settings</span>
+    </a>
+    {% endif %}
+
+    <hr style="opacity: 0.2; margin: 24px 0;">
+
+    <a href="{{ url_for('logout') }}">
+      <i class="fa-solid fa-right-from-bracket"></i>
+      <span>Logout</span>
+    </a>
+  </aside>
+  {% endif %}
+
+  <!-- Main Content -->
+  <main id="mainContent" class="main-content" role="main">
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-messages mb-3">
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+              <strong>
+                {% if category == 'success' %}<i class="fa-solid fa-check-circle"></i>
+                {% elif category == 'danger' %}<i class="fa-solid fa-exclamation-circle"></i>
+                {% elif category == 'warning' %}<i class="fa-solid fa-exclamation-triangle"></i>
+                {% elif category == 'info' %}<i class="fa-solid fa-info-circle"></i>
+                {% endif %}
+              </strong>
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <!-- Page Content -->
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <p style="font-weight: 600; font-size: 15px;">© 2025 IT Ticketing Portal. All rights reserved.</p>
+    <p>Designed & Developed with <i class="fa-solid fa-heart" style="color: #ef4444;"></i> by <a href="#">Tanya Gupta</a></p>
+  </footer>
+
+  <!-- Toast Notification -->
+  <div id="toast" role="status" aria-live="polite"></div>
+
+  <!-- Core Scripts -->
+  <script>
+    (function () {
+      'use strict';
+
+      // Theme management
+      const metaEl = document.querySelector("meta[name='user-theme']");
+      const metaUser = metaEl ? metaEl.content : "";
+      const stored = localStorage.getItem("theme");
+      const systemDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+      const initial = stored || metaUser || (systemDark ? "dark" : "light");
+
+      function applyTheme(mode) {
+        document.documentElement.setAttribute("data-theme", mode);
+        const btn = document.getElementById("themeToggle");
+        if (btn) {
+          btn.textContent = mode === "dark" ? "☀️" : "🌙";
+          btn.setAttribute("title", mode === "dark" ? "Switch to light mode" : "Switch to dark mode");
+        }
+      }
+
+      applyTheme(initial);
+
+      const themeBtn = document.getElementById("themeToggle");
+      if (themeBtn) {
+        themeBtn.addEventListener("click", () => {
+          const cur = document.documentElement.getAttribute("data-theme");
+          const next = cur === "dark" ? "light" : "dark";
+          applyTheme(next);
+          localStorage.setItem("theme", next);
+        });
+      }
+
+      // Sidebar toggle
+      const side = document.getElementById("sidebar");
+      const main = document.getElementById("mainContent");
+      const sidebarToggle = document.getElementById("sidebarToggle");
+
+      if (sidebarToggle && side && main) {
+        if (window.innerWidth <= 900) {
+          sidebarToggle.style.display = 'flex';
+        }
+
+        sidebarToggle.addEventListener("click", () => {
+          if (window.innerWidth <= 900) {
+            side.classList.toggle("mobile-open");
+          }
+        });
+
+        document.addEventListener("click", (e) => {
+          if (window.innerWidth <= 900 && side.classList.contains("mobile-open")) {
+            if (!side.contains(e.target) && !sidebarToggle.contains(e.target)) {
+              side.classList.remove("mobile-open");
+            }
+          }
+        });
+      }
+
+      // Toast functionality
+      window.showToast = function(msg, type = 'info') {
+        const t = document.getElementById("toast");
+        if (!t) return;
+        
+        const icons = {
+          'success': '<i class="fa-solid fa-check-circle" style="color: #10b981;"></i>',
+          'error': '<i class="fa-solid fa-times-circle" style="color: #ef4444;"></i>',
+          'warning': '<i class="fa-solid fa-exclamation-triangle" style="color: #f59e0b;"></i>',
+          'info': '<i class="fa-solid fa-info-circle" style="color: #3b82f6;"></i>'
+        };
+        
+        t.innerHTML = `${icons[type] || icons.info} <span style="margin-left: 8px;">${msg}</span>`;
+        t.classList.add("show");
+        setTimeout(() => t.classList.remove("show"), 2800);
+      };
+
+      // Auto-dismiss alerts
+      setTimeout(() => {
+        const alerts = document.querySelectorAll('.alert:not(.alert-permanent)');
+        alerts.forEach(alert => {
+          const bsAlert = new bootstrap.Alert(alert);
+          bsAlert.close();
+        });
+      }, 5000);
+    })();
+  </script>
+
+  <!-- Notification System with Persistence Fix -->
+  <script>
+    // Close notification dropdown
+    function closeNotificationDropdown() {
+      const dropdown = document.getElementById("notificationDropdown");
+      if (dropdown) {
+        dropdown.classList.remove("show");
+      }
+    }
+
+    const notificationBell = document.getElementById("notificationBell");
+    const notificationDropdown = document.getElementById("notificationDropdown");
+    const notificationBadge = document.getElementById("notificationBadge");
+    const notificationList = document.getElementById("notificationList");
+    let currentNotificationCount = 0;
+    const NOTIFICATION_STORAGE_KEY = `notifications_dismissed_${Date.now()}`;
+
+    // Toggle notification dropdown
+    if (notificationBell) {
+      notificationBell.addEventListener("click", (e) => {
+        e.stopPropagation();
+        notificationDropdown.classList.toggle("show");
+      });
+
+      document.addEventListener("click", (e) => {
+        if (!notificationBell.contains(e.target) && !notificationDropdown.contains(e.target)) {
+          notificationDropdown.classList.remove("show");
+        }
+      });
+    }
+
+    // Mark notification as read
+    function markNotificationAsRead(notificationId, isAll = false) {
+      if (isAll) {
+        // Mark all as read in backend
+        fetch('/api/notifications/mark-all-read', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        })
+        .then(r => r.json())
+        .then(data => {
+          if (data.success) {
+            notificationBadge.textContent = "0";
+            notificationBadge.style.display = "none";
+            notificationList.innerHTML = '<div class="notification-empty"><p>All notifications marked as read</p></div>';
+            currentNotificationCount = 0;
+          }
+        })
+        .catch(e => console.error('Error:', e));
+      } else {
+        // Mark single notification as read
+        fetch(`/api/notifications/${notificationId}/read`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        })
+        .then(r => r.json())
+        .catch(e => console.error('Error:', e));
+      }
+    }
+
+    // Load notifications from server
+    async function loadNotifications() {
+      try {
+        const countRes = await fetch("/api/notifications/count");
+        const countData = await countRes.json();
+        let count = countData.count || 0;
+        
+        currentNotificationCount = count;
+
+        if (count > 0) {
+          notificationBadge.textContent = count > 99 ? "99+" : count;
+          notificationBadge.style.display = "flex";
+        } else {
+          notificationBadge.style.display = "none";
+        }
+
+        const listRes = await fetch("/api/notifications/list");
+        const listData = await listRes.json();
+        const notifications = listData.notifications || [];
+
+        if (notifications.length === 0) {
+          notificationList.innerHTML = '<div class="notification-empty"><p>No new notifications</p></div>';
+        } else {
+          notificationList.innerHTML = notifications.map(notif => `
+            <a href="${notif.link}" class="notification-item" onclick="markNotificationAsRead(${notif.id}); closeNotificationDropdown(); return true;">
+              <div class="notification-icon-wrapper">
+                <i class="fa-solid ${notif.icon || 'fa-bell'}"></i>
+              </div>
+              <div class="notification-content">
+                <div class="notification-title">${notif.title}</div>
+                <div class="notification-message">${notif.message}</div>
+              </div>
+            </a>
+          `).join("");
+        }
+      } catch (error) {
+        console.error("Error loading notifications:", error);
+        notificationList.innerHTML = '<div class="notification-empty"><p>Error loading notifications</p></div>';
+      }
+    }
+
+    // Clear all notifications (mark as read)
+    window.clearNotifications = function() {
+      markNotificationAsRead(null, true);
+    };
+
+    // Load notifications on page load and set interval
+    if (notificationBell) {
+      loadNotifications();
+      setInterval(loadNotifications, 30000); // Poll every 30 seconds
+    }
+
+    // Loading bar for page transitions
+    const loadingBar = document.querySelector('.loading-bar') || (() => {
+      const bar = document.createElement('div');
+      bar.className = 'loading-bar hidden';
+      document.body.insertBefore(bar, document.body.firstChild);
+      return bar;
+    })();
+
+    // Show loading bar on page navigation
+    document.addEventListener('click', (e) => {
+      const link = e.target.closest('a');
+      if (link && !link.target && !link.href.startsWith('#') && link.href.startsWith(window.location.origin)) {
+        if (!loadingBar.classList.contains('hidden')) return;
+        loadingBar.classList.remove('hidden');
+        setTimeout(() => {
+          loadingBar.classList.add('hidden');
+        }, 1500);
+      }
+    });
+  </script>
+
+  <!-- Bootstrap Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Per-page scripts block -->
+  {% block scripts %}{% endblock %}
+</body>
+</html>

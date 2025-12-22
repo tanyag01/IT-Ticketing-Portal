@@ -1,0 +1,883 @@
+{% extends "layout.html" %}
+{% block title %}User Management - Admin Panel{% endblock %}
+
+{% block head %}
+<style>
+    /* Page Header */
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        padding: 24px;
+        background: var(--bg-card-final);
+        border: 1px solid var(--border-final);
+        border-radius: var(--card-radius);
+        box-shadow: 0 2px 8px var(--shadow-final);
+    }
+
+    .page-title {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--text-main);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .page-title i {
+        color: var(--brand);
+    }
+
+    .page-subtitle {
+        margin: 4px 0 0 0;
+        color: var(--text-muted-final);
+        font-size: 14px;
+    }
+
+    /* Stats Bar */
+    .stats-bar {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .stat-card {
+        background: var(--bg-card-final);
+        border: 1px solid var(--border-final);
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 2px 8px var(--shadow-final);
+        transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 16px var(--shadow-final);
+    }
+
+    .stat-value {
+        font-size: 32px;
+        font-weight: 700;
+        color: var(--text-main);
+        margin-bottom: 4px;
+    }
+
+    .stat-label {
+        font-size: 14px;
+        color: var(--text-muted-final);
+        font-weight: 500;
+    }
+
+    .stat-icon {
+        float: right;
+        font-size: 24px;
+        opacity: 0.3;
+    }
+
+    /* Table Card */
+    .table-card {
+        background: var(--bg-card-final);
+        border: 1px solid var(--border-final);
+        border-radius: var(--card-radius);
+        padding: 24px;
+        box-shadow: 0 2px 8px var(--shadow-final);
+        margin-bottom: 24px;
+    }
+
+    .table-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 16px;
+        border-bottom: 2px solid var(--border-final);
+    }
+
+    .table-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--text-main);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .table-actions {
+        display: flex;
+        gap: 8px;
+    }
+
+    /* Search Bar */
+    .search-bar {
+        margin-bottom: 20px;
+        position: relative;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 12px 16px 12px 44px;
+        border: 1px solid var(--border-final);
+        border-radius: 8px;
+        background: var(--bg-main);
+        color: var(--text-main);
+        font-size: 14px;
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: var(--brand);
+        box-shadow: 0 0 0 3px rgba(10, 75, 120, 0.1);
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-muted-final);
+        pointer-events: none;
+    }
+
+    /* Table */
+    .users-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .users-table thead th {
+        padding: 14px 12px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 13px;
+        color: var(--text-main);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 2px solid var(--border-final);
+        background: var(--bg-main);
+    }
+
+    .users-table tbody td {
+        padding: 16px 12px;
+        border-bottom: 1px solid var(--border-final);
+        color: var(--text-main);
+        font-size: 14px;
+    }
+
+    .users-table tbody tr {
+        transition: all 0.3s ease;
+    }
+
+    .users-table tbody tr:hover {
+        background: rgba(10, 75, 120, 0.05);
+    }
+
+    /* User Info */
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: var(--brand);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 16px;
+    }
+
+    .user-details {
+        flex: 1;
+    }
+
+    .user-name {
+        font-weight: 600;
+        color: var(--text-main);
+        margin-bottom: 2px;
+    }
+
+    .user-meta {
+        font-size: 12px;
+        color: var(--text-muted-final);
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    /* Badges */
+    .badge {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+    }
+
+    .badge-admin { background: #8b5cf6; color: white; }
+    .badge-assignee { background: #3b82f6; color: white; }
+    .badge-engineer { background: #06b6d4; color: white; }
+    .badge-user { background: #64748b; color: white; }
+    .badge-active { background: #10b981; color: white; }
+    .badge-inactive { background: #ef4444; color: white; }
+
+    /* Action Buttons */
+    .btn {
+        padding: 10px 18px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+        border: none;
+        font-size: 14px;
+    }
+
+    .btn-solid {
+        background: var(--brand);
+        color: white;
+    }
+
+    .btn-solid:hover {
+        background: var(--brand-light);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(10, 75, 120, 0.3);
+    }
+
+    .btn-outline {
+        background: transparent;
+        color: var(--text-main);
+        border: 1px solid var(--border-final);
+        padding: 8px 14px;
+        font-size: 13px;
+    }
+
+    .btn-outline:hover {
+        background: rgba(10, 75, 120, 0.1);
+        border-color: var(--brand);
+        color: var(--brand);
+    }
+
+    .btn-small {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+
+    /* Form Card */
+    .form-card {
+        background: var(--bg-card-final);
+        border: 1px solid var(--border-final);
+        border-radius: var(--card-radius);
+        padding: 32px;
+        box-shadow: 0 2px 8px var(--shadow-final);
+        max-width: 700px;
+        margin: 0 auto;
+    }
+
+    .form-title {
+        margin: 0 0 8px 0;
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--text-main);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .form-title i {
+        color: var(--brand);
+    }
+
+    .form-subtitle {
+        margin: 0 0 24px 0;
+        color: var(--text-muted-final);
+        font-size: 14px;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group.full-width {
+        grid-column: 1 / -1;
+    }
+
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        color: var(--text-main);
+        margin-bottom: 8px;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .form-group label i {
+        color: var(--brand);
+        width: 16px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px 14px;
+        border: 1px solid var(--border-final);
+        border-radius: 8px;
+        background: var(--bg-main);
+        color: var(--text-main);
+        font-size: 14px;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--brand);
+        box-shadow: 0 0 0 3px rgba(10, 75, 120, 0.1);
+    }
+
+    .checkbox-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        background: var(--bg-main);
+        border: 1px solid var(--border-final);
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .checkbox-wrapper:hover {
+        background: rgba(10, 75, 120, 0.05);
+        border-color: var(--brand);
+    }
+
+    .checkbox-wrapper input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+        accent-color: var(--brand);
+    }
+
+    .checkbox-label {
+        font-weight: 500;
+        color: var(--text-main);
+        cursor: pointer;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 24px;
+        padding-top: 24px;
+        border-top: 2px solid var(--border-final);
+    }
+
+    .btn-submit {
+        flex: 1;
+        padding: 14px;
+        justify-content: center;
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: var(--text-muted-final);
+    }
+
+    .empty-state i {
+        font-size: 64px;
+        opacity: 0.3;
+        margin-bottom: 16px;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .page-header {
+            flex-direction: column;
+            gap: 16px;
+            align-items: flex-start;
+        }
+
+        .stats-bar {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .users-table thead {
+            display: none;
+        }
+
+        .users-table tbody tr {
+            display: block;
+            margin-bottom: 16px;
+            border: 1px solid var(--border-final);
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .users-table tbody td {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border: none;
+        }
+
+        .users-table tbody td::before {
+            content: attr(data-label);
+            font-weight: 600;
+            color: var(--text-muted-final);
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+    }
+
+    /* Modal Overlay */
+    .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.6);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+        backdrop-filter: blur(4px);
+        animation: fadeIn 0.3s ease;
+    }
+
+    .modal-overlay.active {
+        display: flex;
+    }
+
+    .modal-content {
+        background: var(--bg-card-final);
+        border-radius: 16px;
+        padding: 0;
+        width: 90%;
+        max-width: 700px;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        animation: slideUp 0.3s ease;
+    }
+
+    .modal-header {
+        padding: 24px 32px;
+        border-bottom: 1px solid var(--border-final);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .modal-header h3 {
+        margin: 0;
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--text-main);
+    }
+
+    .modal-close {
+        background: none;
+        border: none;
+        font-size: 24px;
+        color: var(--text-muted-final);
+        cursor: pointer;
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+
+    .modal-close:hover {
+        background: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+    }
+
+    .modal-body {
+        padding: 32px;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+        from {
+            transform: translateY(30px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Page Header -->
+<div class="page-header">
+    <div>
+        <h2 class="page-title">
+            <i class="fa-solid fa-users"></i>
+            User Management
+        </h2>
+        <p class="page-subtitle">Create, edit, and manage system users and permissions</p>
+    </div>
+    <button class="btn btn-solid" onclick="openCreateModal()">
+        <i class="fa-solid fa-user-plus"></i> Add User
+    </button>
+</div>
+
+<!-- Stats Bar -->
+<div class="stats-bar">
+    <div class="stat-card">
+        <i class="stat-icon fa-solid fa-users"></i>
+        <div class="stat-value">{{ users|length }}</div>
+        <div class="stat-label">Total Users</div>
+    </div>
+    <div class="stat-card">
+        <i class="stat-icon fa-solid fa-user-check"></i>
+        <div class="stat-value">{{ users|selectattr('active')|list|length }}</div>
+        <div class="stat-label">Active</div>
+    </div>
+    <div class="stat-card">
+        <i class="stat-icon fa-solid fa-user-shield"></i>
+        <div class="stat-value">{{ users|selectattr('role', 'equalto', 'admin')|list|length }}</div>
+        <div class="stat-label">Admins</div>
+    </div>
+    <div class="stat-card">
+        <i class="stat-icon fa-solid fa-user-tie"></i>
+        <div class="stat-value">{{ users|selectattr('role', 'in', ['assignee', 'engineer'])|list|length }}</div>
+        <div class="stat-label">Engineers</div>
+    </div>
+</div>
+
+<!-- Users Table -->
+<div class="table-card">
+    <div class="table-header">
+        <div class="table-title">
+            <i class="fa-solid fa-list"></i>
+            All Users
+        </div>
+        <div class="table-actions">
+            <button class="btn btn-outline btn-small" onclick="location.reload()">
+                <i class="fa-solid fa-rotate"></i> Refresh
+            </button>
+        </div>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="search-bar">
+        <i class="fa-solid fa-search search-icon"></i>
+        <input type="text" id="searchInput" class="search-input" placeholder="Search by name, email, or role...">
+    </div>
+
+    <!-- Table -->
+    {% if users %}
+    <div class="table-responsive">
+        <table class="users-table" id="usersTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>User</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Department</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for u in users %}
+                <tr>
+                    <td data-label="ID">{{ u.id }}</td>
+                    <td data-label="User">
+                        <div class="user-info">
+                            <div class="user-avatar">{{ u.name[0].upper() }}</div>
+                            <div class="user-details">
+                                <div class="user-name">{{ u.name }}</div>
+                                <div class="user-meta">
+                                    <i class="fa-solid fa-calendar"></i>
+                                    Joined {{ u.created_at.strftime('%b %d, %Y') if u.created_at else 'N/A' }}
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td data-label="Email">{{ u.email }}</td>
+                    <td data-label="Role">
+                        <span class="badge badge-{{ u.role|lower }}">
+                            {{ u.role|capitalize }}
+                        </span>
+                    </td>
+                    <td data-label="Department">{{ u.department or '—' }}</td>
+                    <td data-label="Status">
+                        {% if u.active %}
+                            <span class="badge badge-active">Active</span>
+                        {% else %}
+                            <span class="badge badge-inactive">Inactive</span>
+                        {% endif %}
+                    </td>
+                    <td data-label="Actions">
+                        <a href="{{ url_for('admin_user_edit', user_id=u.id) }}" 
+                           class="btn btn-outline btn-small">
+                            <i class="fa-solid fa-edit"></i> Edit
+                        </a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <i class="fa-solid fa-users"></i>
+        <h3>No Users Found</h3>
+        <p>Click "Add User" to create your first user.</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Create User Modal -->
+<div class="modal-overlay" id="createModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>
+                <i class="fa-solid fa-user-plus"></i>
+                Create New User
+            </h3>
+            <button class="modal-close" onclick="closeCreateModal()">
+                <i class="fa-solid fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form method="POST" id="createUserForm">
+                {{ form.hidden_tag() }}
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="name">
+                            <i class="fa-solid fa-id-card"></i>
+                            Full Name *
+                        </label>
+                        {{ form.name(class="form-control", id="name", placeholder="John Doe", required=True) }}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">
+                            <i class="fa-solid fa-envelope"></i>
+                            Email Address *
+                        </label>
+                        {{ form.email(class="form-control", id="email", placeholder="user@company.com", required=True) }}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">
+                            <i class="fa-solid fa-key"></i>
+                            Password *
+                        </label>
+                        {{ form.password(class="form-control", id="password", placeholder="Min. 8 characters", required=True) }}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="role">
+                            <i class="fa-solid fa-user-shield"></i>
+                            Role *
+                        </label>
+                        {{ form.role(class="form-control", id="role") }}
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="department">
+                            <i class="fa-solid fa-building"></i>
+                            Department
+                        </label>
+                        {{ form.department(class="form-control", id="department", placeholder="e.g., IT, HR, Finance") }}
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label>
+                            <i class="fa-solid fa-toggle-on"></i>
+                            Account Status
+                        </label>
+                        <div class="checkbox-wrapper">
+                            {{ form.active(id="active") }}
+                            <label for="active" class="checkbox-label">Account is active and can log in</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-solid btn-submit" id="submitBtn">
+                        <i class="fa-solid fa-user-plus"></i>
+                        Create User
+                    </button>
+                    <button type="button" class="btn btn-outline" onclick="closeCreateModal()">
+                        <i class="fa-solid fa-times"></i>
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function() {
+    'use strict';
+
+    const searchInput = document.getElementById('searchInput');
+    const table = document.getElementById('usersTable');
+    const createModal = document.getElementById('createModal');
+    const createForm = document.getElementById('createUserForm');
+    const submitBtn = document.getElementById('submitBtn');
+
+    // Open/Close Modal
+    window.openCreateModal = function() {
+        createModal.classList.add('active');
+        document.getElementById('name').focus();
+    };
+
+    window.closeCreateModal = function() {
+        createModal.classList.remove('active');
+        createForm.reset();
+    };
+
+    // Close modal on outside click
+    createModal.addEventListener('click', function(e) {
+        if (e.target === createModal) {
+            closeCreateModal();
+        }
+    });
+
+    // Search functionality
+    if (searchInput && table) {
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase().trim();
+            const rows = table.querySelectorAll('tbody tr');
+
+            let visibleCount = 0;
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            if (visibleCount === 0 && searchTerm) {
+                // Could show "no results" message
+                console.log('No users found');
+            }
+        });
+    }
+
+    // Form validation
+    if (createForm) {
+        createForm.addEventListener('submit', function(e) {
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+
+            if (!name) {
+                e.preventDefault();
+                window.showToast('Please enter a name', 'warning');
+                document.getElementById('name').focus();
+                return;
+            }
+
+            if (!email) {
+                e.preventDefault();
+                window.showToast('Please enter an email address', 'warning');
+                document.getElementById('email').focus();
+                return;
+            }
+
+            // Email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                e.preventDefault();
+                window.showToast('Please enter a valid email address', 'warning');
+                document.getElementById('email').focus();
+                return;
+            }
+
+            if (!password || password.length < 8) {
+                e.preventDefault();
+                window.showToast('Password must be at least 8 characters', 'warning');
+                document.getElementById('password').focus();
+                return;
+            }
+
+            // Add loading state
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Creating...';
+        });
+    }
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+        // Ctrl/Cmd + K to focus search
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+            e.preventDefault();
+            searchInput.focus();
+        }
+
+        // Ctrl/Cmd + N to open create modal
+        if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
+            e.preventDefault();
+            openCreateModal();
+        }
+
+        // Escape to close modal
+        if (e.key === 'Escape' && createModal.classList.contains('active')) {
+            closeCreateModal();
+        }
+    });
+
+    // Remove loading state if page reloads with errors
+    window.addEventListener('load', function() {
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Create User';
+        }
+    });
+
+})();
+</script>
+{% endblock %}

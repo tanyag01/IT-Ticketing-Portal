@@ -1,0 +1,835 @@
+{% extends "layout.html" %}
+{% block title %}All Tickets - Admin Panel{% endblock %}
+
+{% block head %}
+<style>
+    /* Page Header */
+    .tickets-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        padding: 24px;
+        background: var(--bg-card-final);
+        border: 1px solid var(--border-final);
+        border-radius: var(--card-radius);
+        box-shadow: 0 2px 8px var(--shadow-final);
+    }
+
+    .page-title {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--text-main);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .page-title i {
+        color: var(--brand);
+    }
+
+    .page-subtitle {
+        margin: 4px 0 0 0;
+        color: var(--text-muted-final);
+        font-size: 14px;
+    }
+
+    /* Filter Bar */
+    .filter-bar {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 20px;
+        padding: 20px;
+        background: var(--bg-card-final);
+        border: 1px solid var(--border-final);
+        border-radius: var(--card-radius);
+        box-shadow: 0 2px 8px var(--shadow-final);
+        flex-wrap: wrap;
+    }
+
+    .filter-group {
+        flex: 1;
+        min-width: 180px;
+    }
+
+    .filter-group label {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-main);
+        margin-bottom: 6px;
+    }
+
+    .filter-input {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid var(--border-final);
+        border-radius: 8px;
+        background: var(--bg-main);
+        color: var(--text-main);
+        font-size: 14px;
+    }
+
+    .filter-input:focus {
+        outline: none;
+        border-color: var(--brand);
+        box-shadow: 0 0 0 3px rgba(10, 75, 120, 0.1);
+    }
+
+    .filter-actions {
+        display: flex;
+        gap: 8px;
+        align-items: flex-end;
+    }
+
+    .btn-filter {
+        padding: 10px 16px;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+    }
+
+    .btn-filter.primary {
+        background: var(--brand);
+        color: white;
+    }
+
+    .btn-filter.primary:hover {
+        background: var(--brand-light);
+    }
+
+    .btn-filter.secondary {
+        background: transparent;
+        color: var(--text-main);
+        border: 1px solid var(--border-final);
+    }
+
+    .btn-filter.secondary:hover {
+        background: rgba(10, 75, 120, 0.1);
+    }
+
+    /* Stats Bar */
+    .stats-bar {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+
+    .stat-item {
+        flex: 1;
+        min-width: 140px;
+        padding: 14px 18px;
+        background: var(--bg-card-final);
+        border: 1px solid var(--border-final);
+        border-radius: 10px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .stat-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px var(--shadow-final);
+    }
+
+    .stat-value {
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--text-main);
+    }
+
+    .stat-label {
+        font-size: 12px;
+        color: var(--text-muted-final);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-top: 4px;
+    }
+
+    /* Table Card */
+    .table-card {
+        background: var(--bg-card-final);
+        border: 1px solid var(--border-final);
+        border-radius: var(--card-radius);
+        padding: 24px;
+        box-shadow: 0 2px 8px var(--shadow-final);
+    }
+
+    .table-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 16px;
+        border-bottom: 2px solid var(--border-final);
+    }
+
+    .table-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--text-main);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .table-count {
+        font-size: 14px;
+        color: var(--text-muted-final);
+        font-weight: normal;
+        margin-left: 8px;
+    }
+
+    .table-actions {
+        display: flex;
+        gap: 8px;
+    }
+
+    /* Table Styling */
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    .tickets-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .tickets-table thead th {
+        padding: 14px 12px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 13px;
+        color: var(--text-main);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 2px solid var(--border-final);
+        background: var(--bg-main);
+    }
+
+    .tickets-table tbody td {
+        padding: 16px 12px;
+        border-bottom: 1px solid var(--border-final);
+        color: var(--text-main);
+        font-size: 14px;
+    }
+
+    .tickets-table tbody tr {
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .tickets-table tbody tr:hover {
+        background: rgba(10, 75, 120, 0.05);
+    }
+
+    /* Ticket ID Badge */
+    .ticket-id {
+        font-family: 'Courier New', monospace;
+        font-weight: 600;
+        color: var(--brand);
+    }
+
+    /* Ticket Info */
+    .ticket-info {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .ticket-title {
+        font-weight: 600;
+        color: var(--text-main);
+    }
+
+    .ticket-meta {
+        font-size: 12px;
+        color: var(--text-muted-final);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .ticket-meta i {
+        font-size: 10px;
+    }
+
+    /* Status & Priority Badges */
+    .badge {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+    }
+
+    .status-not-open-yet {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.status-open {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.status-in-progress {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.status-re-open {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.status-resolved {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.status-closed {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+
+    .priority-low { background: #d1fae5; color: #065f46; }
+    .priority-medium { background: #fef3c7; color: #92400e; }
+    .priority-high { background: #fed7aa; color: #9a3412; }
+    .priority-critical { background: #fecaca; color: #991b1b; }
+
+    /* Assignee */
+    .assignee-info {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .assignee-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: var(--brand);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 12px;
+    }
+
+    .assignee-name {
+        font-weight: 500;
+        color: var(--text-main);
+    }
+
+    .unassigned {
+        color: var(--text-muted-final);
+        font-style: italic;
+    }
+
+    /* Action Button */
+    .btn-view {
+        padding: 8px 16px;
+        background: var(--brand);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .btn-view:hover {
+        background: var(--brand-light);
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: var(--text-muted-final);
+    }
+
+    .empty-state i {
+        font-size: 64px;
+        opacity: 0.3;
+        margin-bottom: 16px;
+    }
+
+    .empty-state h3 {
+        font-size: 20px;
+        margin-bottom: 8px;
+    }
+
+    .empty-state p {
+        font-size: 14px;
+    }
+
+    /* Pagination */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 24px;
+    }
+
+    .page-btn {
+        padding: 8px 12px;
+        border: 1px solid var(--border-final);
+        background: var(--bg-card-final);
+        color: var(--text-main);
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 500;
+    }
+
+    .page-btn:hover {
+        background: var(--brand);
+        color: white;
+        border-color: var(--brand);
+    }
+
+    .page-btn.active {
+        background: var(--brand);
+        color: white;
+        border-color: var(--brand);
+    }
+
+    .page-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    /* Loading State */
+    .loading-overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: var(--card-radius);
+        backdrop-filter: blur(2px);
+    }
+
+    .spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid var(--border-final);
+        border-top-color: var(--brand);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+        .filter-bar {
+            flex-direction: column;
+        }
+
+        .filter-group {
+            min-width: 100%;
+        }
+
+        .stats-bar {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .tickets-header {
+            flex-direction: column;
+            gap: 16px;
+            align-items: flex-start;
+        }
+
+        .page-title {
+            font-size: 22px;
+        }
+
+        /* Mobile table - show as cards */
+        .tickets-table thead {
+            display: none;
+        }
+
+        .tickets-table tbody tr {
+            display: block;
+            margin-bottom: 16px;
+            border: 1px solid var(--border-final);
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .tickets-table tbody td {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border: none;
+        }
+
+        .tickets-table tbody td::before {
+            content: attr(data-label);
+            font-weight: 600;
+            color: var(--text-muted-final);
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        .stats-bar {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Page Header -->
+<div class="tickets-header">
+    <div>
+        <h2 class="page-title">
+            <i class="fa-solid fa-ticket"></i>
+            All Tickets
+        </h2>
+        <p class="page-subtitle">Manage and track all support tickets</p>
+    </div>
+</div>
+
+<!-- Stats Bar -->
+<div class="stats-bar">
+    <div class="stat-item" onclick="filterByStatus('')" title="Show all tickets">
+        <div class="stat-value">{{ tickets|length }}</div>
+        <div class="stat-label">Total</div>
+    </div>
+
+    <div class="stat-item" onclick="filterByStatus('Not Open Yet')" title="Not opened yet">
+    <div class="stat-value">
+        {{ tickets|selectattr('status', 'equalto', 'Not Open Yet')|list|length }}
+    </div>
+    <div class="stat-label">Not Open Yet</div>
+    </div>
+
+    <div class="stat-item" onclick="filterByStatus('Re-Open')" title="Re-opened tickets">
+    <div class="stat-value">
+        {{ tickets|selectattr('status', 'equalto', 'Re-Open')|list|length }}
+    </div>
+    <div class="stat-label">Re-Open</div>
+    </div>
+
+
+    <div class="stat-item" onclick="filterByStatus('Open')" title="Filter by Open">
+        <div class="stat-value">{{ tickets|selectattr('status', 'equalto', 'Open')|list|length }}</div>
+        <div class="stat-label">Open</div>
+    </div>
+    <div class="stat-item" onclick="filterByStatus('In Progress')" title="Filter by In Progress">
+        <div class="stat-value">{{ tickets|selectattr('status', 'equalto', 'In Progress')|list|length }}</div>
+        <div class="stat-label">In Progress</div>
+    </div>
+    <div class="stat-item" onclick="filterByStatus('Closed')" title="Filter by Closed">
+        <div class="stat-value">{{ tickets|selectattr('status', 'equalto', 'Closed')|list|length }}</div>
+        <div class="stat-label">Closed</div>
+    </div>
+</div>
+
+<!-- Filter Bar -->
+<div class="filter-bar">
+    <div class="filter-group">
+        <label for="searchInput">
+            <i class="fa-solid fa-search"></i> Search
+        </label>
+        <input type="text" id="searchInput" class="filter-input" placeholder="Search by ticket #, type, or category...">
+    </div>
+
+    <div class="filter-group">
+        <label for="statusFilter">
+            <i class="fa-solid fa-filter"></i> Status
+        </label>
+        <select id="statusFilter" class="filter-input">
+           <option value="">All Status</option>
+           <option value="Not Open Yet">Not Open Yet</option>
+           <option value="Open">Open</option>
+           <option value="In Progress">In Progress</option>
+           <option value="Re-Open">Re-Open</option>
+           <option value="Resolved">Resolved</option>
+           <option value="Closed">Closed</option>
+        </select>
+
+    </div>
+
+    <div class="filter-group">
+        <label for="priorityFilter">
+            <i class="fa-solid fa-flag"></i> Priority
+        </label>
+        <select id="priorityFilter" class="filter-input">
+            <option value="">All Priority</option>
+            <option value="Low">Low</option>
+            <option value="Medium">Medium</option>
+            <option value="High">High</option>
+            <option value="Critical">Critical</option>
+        </select>
+    </div>
+
+    <div class="filter-actions">
+        <button class="btn-filter primary" onclick="applyFilters()">
+            <i class="fa-solid fa-check"></i> Apply
+        </button>
+        <button class="btn-filter secondary" onclick="clearFilters()">
+            <i class="fa-solid fa-times"></i> Clear
+        </button>
+    </div>
+</div>
+
+<!-- Table Card -->
+<div class="table-card">
+    <div class="table-header">
+        <div class="table-title">
+            <i class="fa-solid fa-list"></i>
+            Ticket List
+            <span class="table-count" id="ticketCount">({{ tickets|length }} tickets)</span>
+        </div>
+        <div class="table-actions">
+            <button class="btn-filter secondary" onclick="exportTable()">
+                <i class="fa-solid fa-download"></i> Export
+            </button>
+            <button class="btn-filter secondary" onclick="location.reload()">
+                <i class="fa-solid fa-rotate"></i> Refresh
+            </button>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        {% if tickets %}
+        <table class="tickets-table" id="ticketsTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Ticket Info</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                    <th>Assigned To</th>
+                    <th>Created</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for t in tickets %}
+                <tr onclick="window.location.href='{{ url_for('admin_ticket_view', id=t.id) }}'" 
+                    data-status="{{ t.status }}" 
+                    data-priority="{{ t.priority }}">
+                    <td data-label="ID">
+                        <span class="ticket-id">#{{ t.ticket_no or 'T-' + t.id|string }}</span>
+                    </td>
+                    <td data-label="Ticket Info">
+                        <div class="ticket-info">
+                            <div class="ticket-title">{{ t.ticket_type }}</div>
+                            <div class="ticket-meta">
+                                <span><i class="fa-solid fa-folder"></i> {{ t.category or 'Uncategorized' }}</span>
+                                {% if t.user %}
+                                <span><i class="fa-solid fa-user"></i> {{ t.user.name }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </td>
+                    <td data-label="Priority">
+                        <span class="badge priority-{{ t.priority|lower }}">
+                            {{ t.priority }}
+                        </span>
+                    </td>
+                    <td data-label="Status">
+                        <span class="badge status-{{ t.status|lower|replace(' ', '-') }}">
+                            {{ t.status }}
+                        </span>
+                    </td>
+                    <td data-label="Assigned To">
+                        <div class="assignee-info">
+                            {% if t.assignee %}
+                                <div class="assignee-avatar">{{ t.assignee.name[0].upper() }}</div>
+                                <span class="assignee-name">{{ t.assignee.name }}</span>
+                            {% elif t.assignee_name %}
+                                <div class="assignee-avatar">{{ t.assignee_name[0].upper() }}</div>
+                                <span class="assignee-name">{{ t.assignee_name }}</span>
+                            {% else %}
+                                <span class="unassigned">
+                                    <i class="fa-solid fa-user-slash"></i> Unassigned
+                                </span>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td data-label="Created">
+                        {{ t.created_at.strftime('%b %d, %Y') if t.created_at else 'N/A' }}
+                    </td>
+                    <td data-label="Action">
+                        <a href="{{ url_for('admin_ticket_view', id=t.id) }}" 
+                           class="btn-view" 
+                           onclick="event.stopPropagation()">
+                            <i class="fa-solid fa-eye"></i> View
+                        </a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+            <i class="fa-solid fa-inbox"></i>
+            <h3>No Tickets Found</h3>
+            <p>There are no tickets in the system yet.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function() {
+    'use strict';
+
+    const searchInput = document.getElementById('searchInput');
+    const statusFilter = document.getElementById('statusFilter');
+    const priorityFilter = document.getElementById('priorityFilter');
+    const table = document.getElementById('ticketsTable');
+    const ticketCount = document.getElementById('ticketCount');
+
+    // Filter by status from stats
+    window.filterByStatus = function(status) {
+        statusFilter.value = status;
+        applyFilters();
+    };
+
+    // Apply filters
+    window.applyFilters = function() {
+        if (!table) return;
+
+        const searchTerm = searchInput.value.toLowerCase().trim();
+        const statusValue = statusFilter.value;
+        const priorityValue = priorityFilter.value;
+
+        const rows = table.querySelectorAll('tbody tr');
+        let visibleCount = 0;
+
+        rows.forEach(row => {
+            const ticketId = row.querySelector('.ticket-id').textContent.toLowerCase();
+            const ticketInfo = row.querySelector('.ticket-info').textContent.toLowerCase();
+            const status = row.dataset.status;
+            const priority = row.dataset.priority;
+
+            const matchesSearch = !searchTerm || ticketId.includes(searchTerm) || ticketInfo.includes(searchTerm);
+            const matchesStatus = !statusValue || status === statusValue;
+            const matchesPriority = !priorityValue || priority === priorityValue;
+
+            if (matchesSearch && matchesStatus && matchesPriority) {
+                row.style.display = '';
+                visibleCount++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        // Update count
+        ticketCount.textContent = `(${visibleCount} tickets)`;
+
+        // Show toast
+        window.showToast(`Showing ${visibleCount} ticket${visibleCount !== 1 ? 's' : ''}`, 'info');
+    };
+
+    // Clear filters
+    window.clearFilters = function() {
+        searchInput.value = '';
+        statusFilter.value = '';
+        priorityFilter.value = '';
+        applyFilters();
+    };
+
+    // Export table
+    window.exportTable = function() {
+        window.location.href = '{{ url_for("reports", export="csv") }}';
+        window.showToast('Exporting tickets...', 'info');
+    };
+
+    // Real-time search
+    searchInput.addEventListener('input', function() {
+        clearTimeout(this.searchTimeout);
+        this.searchTimeout = setTimeout(() => {
+            applyFilters();
+        }, 300);
+    });
+
+    // Filter change handlers
+    statusFilter.addEventListener('change', applyFilters);
+    priorityFilter.addEventListener('change', applyFilters);
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+        // Ctrl/Cmd + F to focus search
+        if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+            e.preventDefault();
+            searchInput.focus();
+        }
+
+        // Escape to clear filters
+        if (e.key === 'Escape') {
+            clearFilters();
+        }
+    });
+
+    // Auto-refresh every 30 seconds
+    let autoRefreshInterval = setInterval(() => {
+        const hasFilters = searchInput.value || statusFilter.value || priorityFilter.value;
+        if (!hasFilters) {
+            location.reload();
+        }
+    }, 30000);
+
+    // Clear interval when page is hidden
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            clearInterval(autoRefreshInterval);
+        } else {
+            autoRefreshInterval = setInterval(() => {
+                const hasFilters = searchInput.value || statusFilter.value || priorityFilter.value;
+                if (!hasFilters) {
+                    location.reload();
+                }
+            }, 30000);
+        }
+    });
+
+    // Initialize table sorting (optional enhancement)
+    const headers = table ? table.querySelectorAll('thead th') : [];
+    headers.forEach((header, index) => {
+        if (index < headers.length - 1) { // Don't add to action column
+            header.style.cursor = 'pointer';
+            header.title = 'Click to sort';
+        }
+    });
+
+})();
+</script>
+{% endblock %}

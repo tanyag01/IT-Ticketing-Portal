@@ -1,0 +1,1240 @@
+{% extends "layout.html" %}
+{% block title %}Ticket #{{ ticket.ticket_no }} - Admin View{% endblock %}
+
+{% block head %}
+<style>
+    /* Page Header */
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 28px;
+        padding: 28px;
+        background: var(--bg-card-final);
+        border: 1px solid var(--border-final);
+        border-radius: 16px;
+        box-shadow: 0 2px 8px var(--shadow-final);
+        transition: all 0.3s ease;
+    }
+
+    .page-header:hover {
+        box-shadow: 0 8px 20px var(--shadow-final);
+    }
+
+    .page-title-section h2 {
+        margin: 0;
+        font-size: 30px;
+        font-weight: 800;
+        color: var(--text-main);
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        letter-spacing: -0.02em;
+    }
+
+    .page-title-section h2 i {
+        color: #1e40af;
+    }
+
+    .page-subtitle {
+        margin: 6px 0 0 0;
+        color: var(--text-muted-final);
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 12px;
+    }
+
+    .btn-outline {
+        padding: 12px 20px;
+        border: 1.5px solid var(--border-final);
+        background: transparent;
+        color: var(--text-main);
+        border-radius: 10px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        font-size: 14px;
+    }
+
+    .btn-outline:hover {
+        background: rgba(30, 64, 175, 0.1);
+        border-color: #1e40af;
+        color: #1e40af;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(30, 64, 175, 0.2);
+    }
+
+    /* Main Grid Layout */
+    .ticket-view-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 28px;
+    }
+
+    /* Cards */
+    .ticket-card, .side-card {
+        background: var(--bg-card-final);
+        border: 1px solid var(--border-final);
+        border-radius: 16px;
+        padding: 28px;
+        box-shadow: 0 2px 8px var(--shadow-final);
+        transition: all 0.3s ease;
+    }
+
+    .ticket-card:hover, .side-card:hover {
+        box-shadow: 0 8px 20px var(--shadow-final);
+    }
+
+    /* Section Titles */
+    .section-title {
+        margin: 0 0 24px 0;
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--text-main);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding-bottom: 14px;
+        border-bottom: 2px solid var(--border-final);
+    }
+
+    .section-title i {
+        color: #1e40af;
+        font-size: 22px;
+    }
+
+    /* Details List */
+    .details-list {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+    }
+
+    .detail-row {
+        display: grid;
+        grid-template-columns: 160px 1fr;
+        gap: 18px;
+        padding: 14px 0;
+        border-bottom: 1px solid var(--border-final);
+        transition: all 0.2s ease;
+    }
+
+    .detail-row:hover {
+        background: rgba(30, 64, 175, 0.03);
+        padding-left: 8px;
+    }
+
+    .detail-row:last-child {
+        border-bottom: none;
+    }
+
+    .detail-row span {
+        color: var(--text-muted-final);
+        font-size: 13px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .detail-row span i {
+        color: #1e40af;
+        font-size: 14px;
+    }
+
+    .detail-row p {
+        margin: 0;
+        color: var(--text-main);
+        font-size: 15px;
+        font-weight: 500;
+        word-wrap: break-word;
+        line-height: 1.6;
+    }
+
+    /* Status and Priority Badges */
+    .status-badge, .priority-badge {
+        display: inline-block;
+        padding: 7px 16px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        border: 1px solid;
+    }
+
+    /* Status Colors */
+    .status-badge.status-open {
+        background: rgba(245, 158, 11, 0.15);
+        color: #92400e;
+        border-color: rgba(245, 158, 11, 0.3);
+    }
+
+    .status-badge.status-in-progress {
+        background: rgba(59, 130, 246, 0.15);
+        color: #1e40af;
+        border-color: rgba(59, 130, 246, 0.3);
+    }
+
+    .status-badge.status-resolved {
+        background: rgba(99, 102, 241, 0.15);
+        color: #312e81;
+        border-color: rgba(99, 102, 241, 0.3);
+    }
+
+    .status-badge.status-closed {
+        background: rgba(16, 185, 129, 0.15);
+        color: #065f46;
+        border-color: rgba(16, 185, 129, 0.3);
+    }
+
+    .status-badge.status-not-open-yet {
+        background: rgba(156, 163, 175, 0.15);
+        color: #4b5563;
+        border-color: rgba(156, 163, 175, 0.3);
+    }
+
+    .status-badge.status-re-open {
+        background: rgba(220, 38, 38, 0.15);
+        color: #991b1b;
+        border-color: rgba(220, 38, 38, 0.3);
+    }
+
+    /* Priority Colors */
+    .priority-badge.priority-low {
+        background: rgba(16, 185, 129, 0.15);
+        color: #065f46;
+        border-color: rgba(16, 185, 129, 0.3);
+    }
+
+    .priority-badge.priority-medium {
+        background: rgba(245, 158, 11, 0.15);
+        color: #92400e;
+        border-color: rgba(245, 158, 11, 0.3);
+    }
+
+    .priority-badge.priority-high {
+        background: rgba(249, 115, 22, 0.15);
+        color: #9a3412;
+        border-color: rgba(249, 115, 22, 0.3);
+    }
+
+    .priority-badge.priority-critical {
+        background: rgba(220, 38, 38, 0.15);
+        color: #991b1b;
+        border-color: rgba(220, 38, 38, 0.3);
+    }
+
+    /* User Info */
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px;
+        background: rgba(30, 64, 175, 0.06);
+        border-radius: 10px;
+        margin-top: 10px;
+        border: 1px solid rgba(30, 64, 175, 0.15);
+        transition: all 0.3s ease;
+    }
+
+    .user-info:hover {
+        background: rgba(30, 64, 175, 0.1);
+    }
+
+    .user-avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #1e40af, #1e3a8a);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 18px;
+        box-shadow: 0 2px 8px rgba(30, 64, 175, 0.3);
+    }
+
+    .user-details {
+        flex: 1;
+    }
+
+    .user-name {
+        font-weight: 700;
+        color: var(--text-main);
+        margin: 0;
+        font-size: 15px;
+    }
+
+    .user-email {
+        font-size: 13px;
+        color: var(--text-muted-final);
+        margin: 2px 0 0 0;
+    }
+
+    /* Form */
+    .action-form {
+        margin-top: 24px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 10px;
+        font-weight: 600;
+        color: var(--text-main);
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .form-group label i {
+        color: #1e40af;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 13px 16px;
+        border: 1.5px solid var(--border-final);
+        border-radius: 10px;
+        background: var(--bg-card-final) !important;
+        color: var(--text-main) !important;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        font-family: inherit;
+    }
+
+    .form-control::placeholder {
+        color: var(--text-muted-final) !important;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #1e40af;
+        box-shadow: 0 0 0 4px rgba(30, 64, 175, 0.1);
+    }
+
+    textarea.form-control {
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    select.form-control {
+        cursor: pointer;
+    }
+
+    /* Status Grid - Radio Button Style */
+    .status-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+        gap: 12px;
+        margin-bottom: 18px;
+    }
+
+    .status-option {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 14px 16px;
+        border: 2px solid var(--border-final);
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        background: var(--bg-main);
+    }
+
+    .status-option:hover {
+        border-color: #1e40af;
+        background: rgba(30, 64, 175, 0.05);
+        transform: translateY(-2px);
+    }
+
+    .status-option input[type="radio"] {
+        margin: 0;
+        cursor: pointer;
+        width: 18px;
+        height: 18px;
+        accent-color: #1e40af;
+    }
+
+    .status-option input[type="radio"]:checked + label {
+        font-weight: 700;
+    }
+
+    .status-option label {
+        margin: 0;
+        cursor: pointer;
+        font-weight: 500;
+        font-size: 13px;
+        flex: 1;
+        color: var(--text-main);
+    }
+
+    /* Status Option Colors */
+    .status-option.not-open-yet:hover {
+        background: rgba(156, 163, 175, 0.1);
+        border-color: #9ca3af;
+    }
+
+    .status-option.open:hover {
+        background: rgba(245, 158, 11, 0.1);
+        border-color: #f59e0b;
+    }
+
+    .status-option.in-progress:hover {
+        background: rgba(59, 130, 246, 0.1);
+        border-color: #3b82f6;
+    }
+
+    .status-option.resolved:hover {
+        background: rgba(99, 102, 241, 0.1);
+        border-color: #6366f1;
+    }
+
+    .status-option.closed:hover {
+        background: rgba(16, 185, 129, 0.1);
+        border-color: #10b981;
+    }
+
+    .status-option.re-open:hover {
+        background: rgba(239, 68, 68, 0.1);
+        border-color: #ef4444;
+    }
+
+    /* Custom Assignee Box */
+    #customAssigneeBox {
+        animation: slideDown 0.3s ease;
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Submit Button */
+    .btn-submit {
+        width: 100%;
+        padding: 16px;
+        background: linear-gradient(135deg, #1e40af, #1e3a8a);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 15px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        transition: all 0.3s ease;
+        margin-top: 24px;
+    }
+
+    .btn-submit:hover {
+        background: linear-gradient(135deg, #1e3a8a, #1e40af);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(30, 64, 175, 0.4);
+    }
+
+    .btn-submit:active {
+        transform: translateY(0);
+    }
+
+    /* Divider */
+    hr {
+        border: none;
+        border-top: 1px solid var(--border-final);
+        margin: 28px 0;
+        opacity: 0.6;
+    }
+
+    /* Attachments */
+    .attach-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .attach-item {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 14px;
+        background: var(--bg-main);
+        border: 1px solid var(--border-final);
+        border-radius: 10px;
+        color: var(--text-main);
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .attach-item:hover {
+        background: rgba(30, 64, 175, 0.06);
+        border-color: #1e40af;
+        color: #1e40af;
+        transform: translateX(4px);
+    }
+
+    .attach-item i {
+        font-size: 22px;
+        color: #1e40af;
+    }
+
+    .attach-item span {
+        font-weight: 500;
+    }
+
+    .empty-text {
+        text-align: center;
+        color: var(--text-muted-final);
+        padding: 32px;
+        font-style: italic;
+        font-size: 14px;
+    }
+
+    .empty-text i {
+        display: block;
+        font-size: 48px;
+        opacity: 0.3;
+        margin-bottom: 12px;
+    }
+
+    /* History */
+    .history-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        max-height: 450px;
+        overflow-y: auto;
+    }
+
+    .history-item {
+        padding: 16px;
+        border-left: 3px solid #1e40af;
+        background: var(--bg-main);
+        margin-bottom: 14px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .history-item:hover {
+        background: rgba(30, 64, 175, 0.06);
+        transform: translateX(6px);
+    }
+
+    .history-event {
+        color: var(--text-main);
+        font-weight: 600;
+        margin-bottom: 8px;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    .history-time {
+        color: var(--text-muted-final);
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .history-time i {
+        color: #1e40af;
+    }
+
+    .history-empty {
+        text-align: center;
+        color: var(--text-muted-final);
+        padding: 32px;
+        font-style: italic;
+    }
+
+    .history-empty i {
+        display: block;
+        font-size: 48px;
+        opacity: 0.3;
+        margin-bottom: 12px;
+    }
+
+    /* Comments Section */
+    .comments-section {
+        margin-top: 28px;
+    }
+
+    .comment-item {
+        padding: 18px;
+        background: var(--bg-main);
+        border: 1px solid var(--border-final);
+        border-radius: 10px;
+        margin-bottom: 14px;
+        transition: all 0.3s ease;
+    }
+
+    .comment-item:hover {
+        background: rgba(30, 64, 175, 0.04);
+        border-color: #1e40af;
+    }
+
+    .comment-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+
+    .comment-author {
+        font-weight: 700;
+        color: var(--text-main);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 14px;
+    }
+
+    .comment-author i {
+        color: #1e40af;
+        font-size: 18px;
+    }
+
+    .comment-time {
+        font-size: 12px;
+        color: var(--text-muted-final);
+    }
+
+    .comment-message {
+        color: var(--text-main);
+        line-height: 1.7;
+        margin: 0;
+        font-size: 14px;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+        .ticket-view-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .detail-row {
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .status-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .page-header {
+            flex-direction: column;
+            gap: 18px;
+            align-items: flex-start;
+            padding: 24px;
+        }
+
+        .header-actions {
+            width: 100%;
+        }
+
+        .btn-outline {
+            flex: 1;
+            justify-content: center;
+        }
+
+        .page-title-section h2 {
+            font-size: 24px;
+        }
+
+        .status-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* Loading State */
+    .btn-submit.loading {
+        pointer-events: none;
+        opacity: 0.7;
+    }
+
+    .btn-submit .spinner {
+        display: none;
+        width: 18px;
+        height: 18px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-top-color: white;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
+
+    .btn-submit.loading .spinner {
+        display: inline-block;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    /* SLA Alerts */
+    .sla-alert {
+        padding: 14px 18px;
+        border-left: 4px solid;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 600;
+    }
+
+    .sla-warning {
+        background: rgba(239, 68, 68, 0.1);
+        border-color: #ef4444;
+        color: #dc2626;
+    }
+
+    .sla-info {
+        background: rgba(59, 130, 246, 0.1);
+        border-color: #3b82f6;
+        color: #2563eb;
+    }
+
+    .sla-success {
+        background: rgba(16, 185, 129, 0.1);
+        border-color: #10b981;
+        color: #059669;
+    }
+
+    .sla-alert i {
+        font-size: 22px;
+    }
+
+    /* Badge for SLA */
+    .badge-sla-breached {
+        background: rgba(239, 68, 68, 0.15);
+        color: #991b1b;
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        padding: 7px 16px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        display: inline-block;
+        animation: pulse-red 2s infinite;
+    }
+
+    .badge-sla-at-risk {
+        background: rgba(245, 158, 11, 0.15);
+        color: #92400e;
+        border: 1px solid rgba(245, 158, 11, 0.3);
+        padding: 7px 16px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        display: inline-block;
+    }
+
+    .badge-sla-met {
+        background: rgba(16, 185, 129, 0.15);
+        color: #065f46;
+        border: 1px solid rgba(16, 185, 129, 0.3);
+        padding: 7px 16px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        display: inline-block;
+    }
+
+    .badge-info {
+        background: rgba(99, 102, 241, 0.15);
+        color: #312e81;
+        border: 1px solid rgba(99, 102, 241, 0.3);
+        padding: 7px 16px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        display: inline-block;
+    }
+
+    @keyframes pulse-red {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.7; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Page Header -->
+<div class="page-header">
+    <div class="page-title-section">
+        <h2>
+            <i class="fa-solid fa-ticket"></i>
+            Ticket #{{ ticket.ticket_no }}
+        </h2>
+        <p class="page-subtitle">Admin Ticket Management Panel</p>
+    </div>
+
+    <div class="header-actions">
+        <button class="btn-outline" onclick="reloadPage()">
+            <i class="fa-solid fa-rotate"></i> Refresh
+        </button>
+        <a href="{{ url_for('admin_tickets') }}" class="btn-outline">
+            <i class="fa-solid fa-arrow-left"></i> Back
+        </a>
+    </div>
+</div>
+
+<!-- SLA Alerts -->
+{% if ticket.sla_seconds_left is not none %}
+    {% if ticket.sla_seconds_left < 0 %}
+        <div class="sla-alert sla-warning">
+            <i class="fa-solid fa-exclamation-triangle"></i>
+            <span>SLA Breached - Immediate attention required!</span>
+        </div>
+    {% elif ticket.sla_seconds_left < 21600 %}
+        <div class="sla-alert sla-info">
+            <i class="fa-solid fa-clock"></i>
+            <span>SLA At Risk - Less than 6 hours remaining</span>
+        </div>
+    {% else %}
+        <div class="sla-alert sla-success">
+            <i class="fa-solid fa-check-circle"></i>
+            <span>SLA Met - On track</span>
+        </div>
+    {% endif %}
+{% endif %}
+
+<!-- Main Grid -->
+<div class="ticket-view-grid">
+
+    <!-- Left Panel -->
+    <div class="ticket-card">
+
+        <!-- Ticket Details -->
+        <h3 class="section-title">
+            <i class="fa-solid fa-circle-info"></i> Ticket Details
+        </h3>
+
+        <div class="details-list">
+
+            <div class="detail-row">
+                <span><i class="fa-solid fa-user"></i> Created By</span>
+                <div>
+                    <div class="user-info">
+                        <div class="user-avatar">
+                            {{ ticket.user.name[0].upper() if ticket.user else '?' }}
+                        </div>
+                        <div class="user-details">
+                            <p class="user-name">{{ ticket.user.name if ticket.user else 'Unknown' }}</p>
+                            <p class="user-email">{{ ticket.user.email if ticket.user else 'N/A' }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-row">
+                <span><i class="fa-solid fa-calendar"></i> Created At</span>
+                <p>{{ ticket.created_at.strftime("%B %d, %Y at %I:%M %p") }}</p>
+            </div>
+
+            <div class="detail-row">
+                <span><i class="fa-solid fa-tag"></i> Ticket Type</span>
+                <p>{{ ticket.ticket_type }}</p>
+            </div>
+
+            <div class="detail-row">
+                <span><i class="fa-solid fa-folder"></i> Category</span>
+                <p>{{ ticket.category }}</p>
+            </div>
+
+            <div class="detail-row">
+                <span><i class="fa-solid fa-info-circle"></i> Status</span>
+                <p>
+                    <span class="status-badge status-{{ ticket.status | lower | replace(' ','-') }}">
+                        {{ ticket.status }}
+                    </span>
+                </p>
+            </div>
+
+            <div class="detail-row">
+                <span><i class="fa-solid fa-flag"></i> Priority</span>
+                <p>
+                    <span class="priority-badge priority-{{ ticket.priority | lower }}">
+                        {{ ticket.priority }}
+                    </span>
+                </p>
+            </div>
+
+            <div class="detail-row">
+                <span><i class="fa-solid fa-user-gear"></i> Assigned To</span>
+                <p>
+                    {% if ticket.assignee %}
+                        {{ ticket.assignee.name }}
+                    {% elif ticket.assignee_name %}
+                        {{ ticket.assignee_name }}
+                    {% else %}
+                        <em style="color: var(--text-muted-final);">Unassigned</em>
+                    {% endif %}
+                </p>
+            </div>
+
+            <div class="detail-row">
+                <span><i class="fa-solid fa-align-left"></i> Description</span>
+                <p>{{ ticket.description }}</p>
+            </div>
+
+            {% if ticket.due_date %}
+            <div class="detail-row">
+                <span><i class="fa-solid fa-clock"></i> Due Date</span>
+                <p>{{ ticket.due_date.strftime("%B %d, %Y at %I:%M %p") }}</p>
+            </div>
+            {% endif %}
+
+        </div>
+
+        <hr>
+
+        <!-- Admin Action Section -->
+        <h3 class="section-title">
+            <i class="fa-solid fa-user-gear"></i> Update Ticket
+        </h3>
+
+        <form method="POST" action="{{ url_for('admin_ticket_update', id=ticket.id) }}" class="action-form" id="updateForm">
+
+            <!-- Status - Radio Button Grid Style -->
+            <div class="form-group">
+                <label>
+                    <i class="fa-solid fa-info-circle"></i> Status
+                </label>
+                <div class="status-grid">
+                    <label class="status-option not-open-yet">
+                        <input type="radio" name="status" value="Not Open Yet" {% if ticket.status == 'Not Open Yet' %}checked{% endif %}>
+                        <label>Not Open Yet</label>
+                    </label>
+                    
+                    <label class="status-option open">
+                        <input type="radio" name="status" value="Open" {% if ticket.status == 'Open' %}checked{% endif %}>
+                        <label>Open</label>
+                    </label>
+                    
+                    <label class="status-option in-progress">
+                        <input type="radio" name="status" value="In Progress" {% if ticket.status == 'In Progress' %}checked{% endif %}>
+                        <label>In Progress</label>
+                    </label>
+                    
+                    <label class="status-option resolved">
+                        <input type="radio" name="status" value="Resolved" {% if ticket.status == 'Resolved' %}checked{% endif %}>
+                        <label>Resolved</label>
+                    </label>
+                    
+                    <label class="status-option closed">
+                        <input type="radio" name="status" value="Closed" {% if ticket.status == 'Closed' %}checked{% endif %}>
+                        <label>Closed</label>
+                    </label>
+                    
+                    <label class="status-option re-open">
+                        <input type="radio" name="status" value="Re-Open" {% if ticket.status == 'Re-Open' %}checked{% endif %}>
+                        <label>Re-Open</label>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Priority -->
+            <div class="form-group">
+                <label for="priority">
+                    <i class="fa-solid fa-flag"></i> Priority
+                </label>
+                <select name="priority" id="priority" class="form-control">
+                    <option value="Low" {{ 'selected' if ticket.priority=='Low' }}>Low</option>
+                    <option value="Medium" {{ 'selected' if ticket.priority=='Medium' }}>Medium</option>
+                    <option value="High" {{ 'selected' if ticket.priority=='High' }}>High</option>
+                    <option value="Critical" {{ 'selected' if ticket.priority=='Critical' }}>Critical</option>
+                </select>
+            </div>
+
+            <!-- Assign Engineer -->
+            <div class="form-group">
+                <label for="assigneeSelect">
+                    <i class="fa-solid fa-user-plus"></i> Assign Engineer
+                </label>
+                <select name="assignee_id" class="form-control" id="assigneeSelect">
+                    <option value="">-- Unassigned --</option>
+                    <option value="assigned">-- Assigned (Custom Name) --</option>
+                    <option value="queue">-- In Queue --</option>
+
+                    {% for u in engineers %}
+                    <option value="{{ u.id }}" {% if ticket.assignee_id == u.id %}selected{% endif %}>
+                        {{ u.name }}{% if u.department %} ({{ u.department }}){% endif %}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Custom Assignee Name -->
+            <div class="form-group" id="customAssigneeBox" style="display:none;">
+                <label for="customAssignee">
+                    <i class="fa-solid fa-keyboard"></i> Enter Engineer Name
+                </label>
+                <input type="text" name="assignee_name_custom" id="customAssignee" class="form-control"
+                       placeholder="Type engineer name manually..."
+                       value="{{ ticket.assignee_name if not ticket.assignee and ticket.assignee_name else '' }}">
+            </div>
+
+            <!-- Admin Comment -->
+            <div class="form-group">
+                <label for="comment">
+                    <i class="fa-solid fa-comment"></i> Admin Comment
+                </label>
+                <textarea name="comment" id="comment" rows="4" class="form-control" 
+                          placeholder="Add internal notes or update information..."></textarea>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn-submit" id="submitBtn">
+                <span class="spinner"></span>
+                <i class="fa-solid fa-paper-plane"></i>
+                <span>Save Changes</span>
+            </button>
+
+        </form>
+
+    </div>
+
+    <!-- Right Panel -->
+    <div class="side-card">
+
+        <!-- Attachments -->
+        <h3 class="section-title">
+            <i class="fa-solid fa-paperclip"></i> Attachments
+        </h3>
+
+        <div class="attach-list">
+            {% if ticket.attachments %}
+                {% for a in ticket.attachments %}
+                <a class="attach-item" href="{{ url_for('uploaded_file', filename=a.filename) }}" target="_blank">
+                    <i class="fa-solid fa-file"></i>
+                    <span>{{ a.filename }}</span>
+                </a>
+                {% endfor %}
+            {% else %}
+                <p class="empty-text">
+                    <i class="fa-solid fa-inbox"></i>
+                    No attachments uploaded.
+                </p>
+            {% endif %}
+        </div>
+
+        <hr>
+
+        <!-- Activity History -->
+        <h3 class="section-title">
+            <i class="fa-solid fa-clock-rotate-left"></i> Activity History
+        </h3>
+
+        <ul class="history-list">
+            {% if ticket.history %}
+                {% for h in ticket.history %}
+                <li class="history-item">
+                    <div class="history-event">{{ h.event }}</div>
+                    <div class="history-time">
+                        <i class="fa-solid fa-clock"></i>
+                        {{ h.created_at.strftime("%B %d, %Y at %I:%M %p") }}
+                    </div>
+                </li>
+                {% endfor %}
+            {% else %}
+                <li class="history-empty">
+                    <i class="fa-solid fa-hourglass-empty"></i>
+                    No history yet.
+                </li>
+            {% endif %}
+        </ul>
+
+        <hr>
+
+        <!-- Comments (if available) -->
+        {% if ticket.comments is defined and ticket.comments %}
+        <h3 class="section-title">
+            <i class="fa-solid fa-comments"></i> Comments
+        </h3>
+
+        <div class="comments-section">
+            {% for comment in ticket.comments %}
+            <div class="comment-item">
+                <div class="comment-header">
+                    <div class="comment-author">
+                        <i class="fa-solid fa-user-circle"></i>
+                        {{ comment.user.name if comment.user else 'Unknown' }}
+                    </div>
+                    <div class="comment-time">
+                        {{ comment.created_at.strftime("%b %d, %I:%M %p") }}
+                    </div>
+                </div>
+                <p class="comment-message">{{ comment.message }}</p>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function() {
+    'use strict';
+
+    const assigneeSelect = document.getElementById('assigneeSelect');
+    const customBox = document.getElementById('customAssigneeBox');
+    const updateForm = document.getElementById('updateForm');
+    const submitBtn = document.getElementById('submitBtn');
+
+    // Show/hide custom assignee input based on selection
+    function toggleCustomAssignee() {
+        if (assigneeSelect.value === 'assigned') {
+            customBox.style.display = 'block';
+            document.getElementById('customAssignee').focus();
+        } else {
+            customBox.style.display = 'none';
+        }
+    }
+
+    assigneeSelect.addEventListener('change', toggleCustomAssignee);
+
+    // Initialize on page load
+    toggleCustomAssignee();
+
+    // Form submission with loading state
+    updateForm.addEventListener('submit', function(e) {
+        const status = document.querySelector('input[name="status"]:checked');
+        const priority = document.getElementById('priority').value;
+        const assignee = assigneeSelect.value;
+        const customAssignee = document.getElementById('customAssignee').value;
+        const comment = document.getElementById('comment').value;
+
+        // Validate status is selected
+        if (!status) {
+            e.preventDefault();
+            window.showToast('Please select a status', 'warning');
+            return;
+        }
+
+        // Validate custom assignee if selected
+        if (assignee === 'assigned' && !customAssignee.trim()) {
+            e.preventDefault();
+            window.showToast('Please enter an engineer name', 'warning');
+            document.getElementById('customAssignee').focus();
+            return;
+        }
+
+        // Check if any changes were made
+        const hasChanges = comment.trim() || 
+                          status.value !== '{{ ticket.status }}' || 
+                          priority !== '{{ ticket.priority }}' ||
+                          assignee !== '{{ ticket.assignee_id if ticket.assignee_id else "" }}';
+
+        if (!hasChanges) {
+            e.preventDefault();
+            window.showToast('No changes detected', 'info');
+            return;
+        }
+
+        // Add loading state
+        submitBtn.classList.add('loading');
+        submitBtn.disabled = true;
+    });
+
+    // Reload page function
+    window.reloadPage = function() {
+        window.showToast('Refreshing ticket...', 'info');
+        setTimeout(() => {
+            location.reload();
+        }, 500);
+    };
+
+    // Auto-save warning when leaving with unsaved changes
+    let formChanged = false;
+
+    updateForm.querySelectorAll('input, select, textarea').forEach(el => {
+        el.addEventListener('change', function() {
+            formChanged = true;
+        });
+    });
+
+    window.addEventListener('beforeunload', function(e) {
+        if (formChanged) {
+            e.preventDefault();
+            e.returnValue = '';
+        }
+    });
+
+    // Reset form changed flag on submit
+    updateForm.addEventListener('submit', function() {
+        formChanged = false;
+    });
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+        // Ctrl/Cmd + S to save
+        if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+            e.preventDefault();
+            updateForm.submit();
+        }
+        
+        // Ctrl/Cmd + R to refresh (override default)
+        if ((e.ctrlKey || e.metaKey) && e.key === 'r') {
+            e.preventDefault();
+            reloadPage();
+        }
+    });
+
+    // Confirmation for critical status changes
+    document.querySelectorAll('input[name="status"]').forEach(input => {
+        input.addEventListener('change', function() {
+            if (this.value === 'Closed') {
+                const confirmed = confirm('Are you sure you want to close this ticket? This action will mark the ticket as resolved.');
+                if (!confirmed) {
+                    const originalStatus = '{{ ticket.status }}';
+                    const originalRadio = document.querySelector(`input[name="status"][value="${originalStatus}"]`);
+                    if (originalRadio) {
+                        originalRadio.checked = true;
+                    }
+                }
+            }
+        });
+    });
+
+})();
+</script>
+{% endblock %}

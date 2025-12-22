@@ -1,0 +1,689 @@
+{% extends "layout.html" %}
+{% block title %}Login - IT Ticketing Portal{% endblock %}
+
+{% block head %}
+<style>
+    /* Hide sidebar and adjust layout for login page */
+    .sidebar {
+        display: none !important;
+    }
+
+    .main-content {
+        margin-left: 0 !important;
+        padding: 0 !important;
+    }
+
+    /* Login Wrapper */
+    .login-wrapper {
+        min-height: calc(100vh - 70px);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 40px 20px;
+        background: var(--bg-main);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .login-wrapper::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: 
+            radial-gradient(circle at 20% 50%, rgba(30, 64, 175, 0.08) 0%, transparent 50%),
+            radial-gradient(circle at 80% 80%, rgba(30, 64, 175, 0.06) 0%, transparent 50%);
+        pointer-events: none;
+    }
+
+    /* Login Card */
+    .login-card {
+        width: 100%;
+        max-width: 460px;
+        background: var(--bg-card-final);
+        color: var(--text-main);
+        border-radius: 20px;
+        padding: 48px 40px;
+        box-shadow: 0 10px 40px var(--shadow-final);
+        border: 1px solid var(--border-final);
+        backdrop-filter: blur(10px);
+        animation: fadeSlideIn 0.6s ease-out;
+        position: relative;
+        z-index: 1;
+    }
+
+    @keyframes fadeSlideIn {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Header */
+    .login-header {
+        text-align: center;
+        margin-bottom: 36px;
+    }
+
+    .login-icon {
+        width: 70px;
+        height: 70px;
+        background: linear-gradient(135deg, #1e40af, #1e3a8a);
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        font-size: 32px;
+        color: white;
+        box-shadow: 0 6px 16px rgba(30, 64, 175, 0.35);
+    }
+
+    .login-title {
+        font-weight: 800;
+        font-size: 30px;
+        margin-bottom: 10px;
+        color: var(--text-main);
+        letter-spacing: -0.02em;
+    }
+
+    .login-subtitle {
+        font-size: 15px;
+        color: var(--text-muted-final);
+        line-height: 1.5;
+        font-weight: 400;
+    }
+
+    /* Role Selector */
+    .role-selector {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 32px;
+        padding: 6px;
+        background: var(--bg-main);
+        border-radius: 12px;
+        border: 1px solid var(--border-final);
+    }
+
+    .role-btn {
+        flex: 1;
+        padding: 14px;
+        border: none;
+        background: transparent;
+        color: var(--text-muted-final);
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        font-size: 14px;
+    }
+
+    .role-btn:hover {
+        color: var(--text-main);
+        background: rgba(30, 64, 175, 0.05);
+    }
+
+    .role-btn.active {
+        background: linear-gradient(135deg, #1e40af, #1e3a8a);
+        color: white;
+        box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
+    }
+
+    /* Form Styling */
+    .form-group {
+        margin-bottom: 22px;
+    }
+
+    .form-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 600;
+        margin-bottom: 10px;
+        color: var(--text-main);
+        font-size: 14px;
+    }
+
+    .form-label i {
+        color: #1e40af;
+        width: 18px;
+        font-size: 16px;
+    }
+
+    .form-control {
+        border-radius: 10px;
+        height: 52px;
+        border: 1.5px solid var(--border-final);
+        background: var(--bg-main);
+        color: var(--text-main);
+        padding: 14px 16px;
+        font-size: 15px;
+        transition: all 0.3s ease;
+        font-family: inherit;
+        width: 100%;
+    }
+
+    .form-control:focus {
+        border-color: #1e40af;
+        box-shadow: 0 0 0 4px rgba(30, 64, 175, 0.1);
+        background: var(--bg-main);
+        color: var(--text-main);
+    }
+
+    .form-control::placeholder {
+        color: var(--text-muted-final);
+        opacity: 0.6;
+    }
+
+    .form-control.is-invalid {
+        border-color: #ef4444;
+    }
+
+    .form-control.is-invalid:focus {
+        border-color: #ef4444;
+        box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1);
+    }
+
+    .invalid-feedback {
+        display: block;
+        color: #ef4444;
+        font-size: 13px;
+        margin-top: 8px;
+        font-weight: 500;
+    }
+
+    /* Password Toggle */
+    .password-wrapper {
+        position: relative;
+    }
+
+    .password-toggle {
+        position: absolute;
+        right: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: var(--text-muted-final);
+        cursor: pointer;
+        padding: 8px;
+        font-size: 18px;
+        transition: all 0.3s ease;
+        border-radius: 6px;
+    }
+
+    .password-toggle:hover {
+        color: var(--text-main);
+        background: rgba(30, 64, 175, 0.1);
+    }
+
+    /* Submit Button */
+    .btn-login {
+        height: 52px;
+        width: 100%;
+        border-radius: 10px;
+        margin-top: 28px;
+        font-weight: 700;
+        font-size: 16px;
+        background: linear-gradient(135deg, #1e40af, #1e3a8a);
+        border: none;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(30, 64, 175, 0.35);
+        cursor: pointer;
+    }
+
+    .btn-login:hover:not(:disabled) {
+        background: linear-gradient(135deg, #1e3a8a, #1e40af);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(30, 64, 175, 0.4);
+    }
+
+    .btn-login:active:not(:disabled) {
+        transform: translateY(0);
+    }
+
+    .btn-login:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+
+    .btn-login .spinner {
+        display: none;
+        width: 18px;
+        height: 18px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-top-color: white;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
+
+    .btn-login.loading .spinner {
+        display: inline-block;
+    }
+
+    .btn-login.loading span {
+        display: none;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    /* Footer */
+    .login-footer {
+        margin-top: 32px;
+        padding-top: 28px;
+        border-top: 1px solid var(--border-final);
+        text-align: center;
+    }
+
+    .login-footer-text {
+        font-size: 14px;
+        color: var(--text-muted-final);
+        font-weight: 500;
+    }
+
+    .login-footer-text a {
+        color: #1e40af;
+        font-weight: 700;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+
+    .login-footer-text a:hover {
+        color: #3b82f6;
+        text-decoration: underline;
+    }
+
+    /* Alert Styling */
+    .alert {
+        border-radius: 10px;
+        padding: 14px 16px;
+        margin-bottom: 24px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 14px;
+        animation: slideDown 0.4s ease;
+        font-weight: 500;
+        border: none;
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .alert i {
+        font-size: 18px;
+        flex-shrink: 0;
+    }
+
+    .alert-success {
+        background: #d1fae5;
+        color: #065f46;
+    }
+
+    .alert-danger {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .alert-warning {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .alert-info {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+
+    /* Security notice */
+    .security-notice {
+        margin-top: 24px;
+        padding: 14px;
+        background: rgba(30, 64, 175, 0.06);
+        border-radius: 10px;
+        border: 1px solid rgba(30, 64, 175, 0.15);
+        text-align: center;
+        font-size: 13px;
+        color: var(--text-muted-final);
+        font-weight: 500;
+    }
+
+    .security-notice i {
+        color: #1e40af;
+        margin-right: 6px;
+    }
+
+    /* Loading Bar - Linear Progress */
+    .loading-bar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #1e40af, #3b82f6, #1e40af);
+        width: 0%;
+        z-index: 9999;
+        box-shadow: 0 0 10px rgba(30, 64, 175, 0.5);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .loading-bar.active {
+        animation: linearProgress 2s ease-in-out forwards;
+    }
+
+    @keyframes linearProgress {
+        0% {
+            width: 0%;
+            opacity: 1;
+        }
+        70% {
+            width: 90%;
+            opacity: 1;
+        }
+        100% {
+            width: 100%;
+            opacity: 0;
+        }
+    }
+
+    /* Responsive */
+    @media (max-width: 576px) {
+        .login-card {
+            padding: 36px 28px;
+        }
+
+        .login-title {
+            font-size: 26px;
+        }
+
+        .login-icon {
+            width: 60px;
+            height: 60px;
+            font-size: 28px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="login-wrapper">
+    <div class="login-card">
+        
+        <!-- Header -->
+        <div class="login-header">
+            <div class="login-icon">
+                <i class="fa-solid fa-ticket"></i>
+            </div>
+            <h2 class="login-title">Welcome Back</h2>
+            <p class="login-subtitle">Sign in to access your IT ticketing dashboard</p>
+        </div>
+
+        <!-- Role Selector -->
+        <div class="role-selector">
+            <button type="button" class="role-btn {{ 'active' if role != 'admin' else '' }}" data-role="user">
+                <i class="fa-solid fa-user"></i>
+                <span>User</span>
+            </button>
+            <button type="button" class="role-btn {{ 'active' if role == 'admin' else '' }}" data-role="admin">
+                <i class="fa-solid fa-user-shield"></i>
+                <span>Admin</span>
+            </button>
+        </div>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        <i class="fa-solid fa-{{ 'check-circle' if category == 'success' else 'exclamation-circle' if category == 'danger' else 'exclamation-triangle' if category == 'warning' else 'info-circle' }}"></i>
+                        <span>{{ message }}</span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Login Form -->
+        <form method="POST" id="loginForm" autocomplete="off">
+            {{ form.hidden_tag() }}
+
+            <!-- Email -->
+            <div class="form-group">
+                <label class="form-label" for="email">
+                    <i class="fa-regular fa-envelope"></i>
+                    <span>Email Address</span>
+                </label>
+                {% if form.email.errors %}
+                    {{ form.email(
+                        class="form-control is-invalid",
+                        id="email",
+                        placeholder="yourname@company.com",
+                        autocomplete="email",
+                        required=True
+                    ) }}
+                    <div class="invalid-feedback">
+                        {% for error in form.email.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.email(
+                        class="form-control",
+                        id="email",
+                        placeholder="yourname@company.com",
+                        autocomplete="email",
+                        required=True
+                    ) }}
+                {% endif %}
+            </div>
+
+            <!-- Password -->
+            <div class="form-group">
+                <label class="form-label" for="password">
+                    <i class="fa-solid fa-lock"></i>
+                    <span>Password</span>
+                </label>
+                <div class="password-wrapper">
+                    {% if form.password.errors %}
+                        {{ form.password(
+                            class="form-control is-invalid",
+                            id="password",
+                            placeholder="Enter your password",
+                            autocomplete="current-password",
+                            required=True
+                        ) }}
+                        <div class="invalid-feedback" style="position: absolute; width: 100%; margin-top: 8px;">
+                            {% for error in form.password.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.password(
+                            class="form-control",
+                            id="password",
+                            placeholder="Enter your password",
+                            autocomplete="current-password",
+                            required=True
+                        ) }}
+                    {% endif %}
+                    <button type="button" class="password-toggle" id="togglePassword" aria-label="Toggle password visibility">
+                        <i class="fa-solid fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Loading Bar -->
+            <div class="loading-bar" id="loadingBar"></div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-login" id="loginBtn">
+                <span class="spinner"></span>
+                <i class="fa-solid fa-right-to-bracket"></i>
+                <span>Sign In</span>
+            </button>
+        </form>
+
+        <!-- Security Notice -->
+        <div class="security-notice">
+            <i class="fa-solid fa-shield-halved"></i>
+            Your credentials are encrypted and secure
+        </div>
+
+        <!-- Footer -->
+        <div class="login-footer">
+            <p class="login-footer-text">
+                Don't have an account?
+                <a href="{{ url_for('register') }}">Create one now</a>
+            </p>
+        </div>
+
+    </div>
+</div>
+
+<script>
+(function() {
+    'use strict';
+
+    // Password Toggle
+    const passwordField = document.getElementById('password');
+    const toggleBtn = document.getElementById('togglePassword');
+    const toggleIcon = toggleBtn.querySelector('i');
+
+    toggleBtn.addEventListener('click', function() {
+        if (passwordField.type === 'password') {
+            passwordField.type = 'text';
+            toggleIcon.classList.replace('fa-eye', 'fa-eye-slash');
+            toggleBtn.setAttribute('aria-label', 'Hide password');
+        } else {
+            passwordField.type = 'password';
+            toggleIcon.classList.replace('fa-eye-slash', 'fa-eye');
+            toggleBtn.setAttribute('aria-label', 'Show password');
+        }
+    });
+
+    // Role Selection
+    const roleButtons = document.querySelectorAll('.role-btn');
+    const loginForm = document.getElementById('loginForm');
+    let currentRole = '{{ role }}' || 'user';
+
+    roleButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const role = this.dataset.role;
+            
+            // Update active state
+            roleButtons.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Update form action with role parameter
+            const baseUrl = '{{ url_for("login") }}';
+            loginForm.action = `${baseUrl}?role=${role}`;
+            currentRole = role;
+
+            // Update placeholder text based on role
+            const emailField = document.getElementById('email');
+            if (role === 'admin') {
+                emailField.placeholder = 'admin@company.com';
+            } else {
+                emailField.placeholder = 'yourname@company.com';
+            }
+        });
+    });
+
+    // Form Submission with Loading State
+    const loginBtn = document.getElementById('loginBtn');
+    const loadingBar = document.getElementById('loadingBar');
+
+    loginForm.addEventListener('submit', function(e) {
+        const emailField = document.getElementById('email');
+        const passwordField = document.getElementById('password');
+
+        // Basic validation
+        if (!emailField.value || !passwordField.value) {
+            e.preventDefault();
+            window.showToast('Please fill in all fields', 'warning');
+            return;
+        }
+
+        // Email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(emailField.value)) {
+            e.preventDefault();
+            window.showToast('Please enter a valid email address', 'warning');
+            emailField.focus();
+            return;
+        }
+
+        // Show loading state
+        if (loadingBar) {
+            loadingBar.classList.add('active');
+        }
+
+        // Add loading state to button
+        loginBtn.classList.add('loading');
+        loginBtn.disabled = true;
+    });
+
+    // Auto-focus email field
+    document.getElementById('email').focus();
+
+    // Handle Enter key on password field
+    passwordField.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            loginForm.submit();
+        }
+    });
+
+    // Remove loading state if there's an error (page reloads with errors)
+    window.addEventListener('load', function() {
+        if (loginBtn) {
+            loginBtn.classList.remove('loading');
+            loginBtn.disabled = false;
+        }
+        if (loadingBar) {
+            loadingBar.classList.remove('active');
+        }
+    });
+
+    // Clear any error alerts after animation
+    setTimeout(() => {
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(alert => {
+            alert.addEventListener('click', function(e) {
+                if (e.target.classList.contains('btn-close')) {
+                    this.remove();
+                }
+            });
+        });
+    }, 100);
+})();
+</script>
+{% endblock %}
+
+{% block scripts %}
+<!-- Additional scripts for login page if needed -->
+{% endblock %}

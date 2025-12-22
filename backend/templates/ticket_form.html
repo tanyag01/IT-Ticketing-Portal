@@ -1,0 +1,261 @@
+{% extends "layout.html" %}
+{% block title %}Create Ticket - IT Ticketing Portal{% endblock %}
+
+{% block head %}
+<style>
+    .form-card {
+        max-width: 620px;
+        margin: 32px auto;
+        background: var(--bg-card-final);
+        border: 1px solid var(--border-final);
+        border-radius: 14px;
+        padding: 32px;
+        box-shadow: 0 2px 8px var(--shadow-final);
+    }
+
+    .form-header {
+        margin-bottom: 28px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid var(--border-final);
+    }
+
+    .form-header h2 {
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--text-main);
+        margin: 0 0 8px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .form-header h2 i {
+        color: var(--brand);
+    }
+
+    .form-header p {
+        font-size: 14px;
+        color: var(--text-muted-final);
+        margin: 0;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: var(--text-main);
+    }
+
+    .form-group small {
+        display: block;
+        font-size: 12px;
+        color: var(--text-muted-final);
+        margin-top: 4px;
+    }
+
+    /* Form Controls - Light Mode Fix */
+    .form-control,
+    .form-select {
+        width: 100%;
+        padding: 12px 14px;
+        border-radius: 8px;
+        border: 1.5px solid var(--border-final);
+        background: var(--bg-card-final) !important;
+        font-size: 14px;
+        color: var(--text-main) !important;
+        font-family: inherit;
+        transition: all 0.2s ease;
+    }
+
+    .form-control::placeholder,
+    .form-select::placeholder {
+        color: var(--text-muted-final) !important;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        outline: none;
+        border-color: var(--brand);
+        box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+    }
+
+    textarea.form-control {
+        resize: vertical;
+        min-height: 120px;
+    }
+
+    /* Form Errors */
+    .form-errors {
+        margin-top: 8px;
+    }
+
+    .form-errors .flash {
+        margin-bottom: 8px;
+        padding: 10px 12px;
+        border-radius: 6px;
+        font-size: 13px;
+        background: #fee2e2;
+        color: #991b1b;
+        border-left: 3px solid #ef4444;
+    }
+
+    /* Form Actions */
+    .form-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 28px;
+        padding-top: 20px;
+        border-top: 1px solid var(--border-final);
+    }
+
+    .btn-submit {
+        flex: 1;
+        padding: 12px 24px;
+        background: linear-gradient(135deg, var(--brand), #1e3a8a);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .btn-submit:hover {
+        background: linear-gradient(135deg, #1e3a8a, var(--brand));
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
+    }
+
+    .btn-submit:active {
+        transform: translateY(0);
+    }
+
+    /* Form Footer */
+    .form-footer {
+        text-align: center;
+        margin-top: 16px;
+        padding-top: 16px;
+    }
+
+    .form-footer a {
+        color: var(--brand);
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 500;
+    }
+
+    .form-footer a:hover {
+        text-decoration: underline;
+    }
+
+    /* Helper Text */
+    .form-helper {
+        font-size: 12px;
+        color: var(--text-muted-final);
+        margin-top: 4px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .form-helper i {
+        color: var(--brand);
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+        .form-card {
+            margin: 16px;
+            padding: 20px;
+        }
+
+        .form-header h2 {
+            font-size: 22px;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="form-card">
+    <!-- Form Header -->
+    <div class="form-header">
+        <h2>
+            <i class="fa-solid fa-ticket"></i>
+            {{ title if title else "Create Ticket" }}
+        </h2>
+        <p>Provide accurate details to help IT resolve your issue faster.</p>
+    </div>
+
+    <!-- Ticket Form -->
+    <form method="POST" enctype="multipart/form-data" class="ticket-form">
+        {{ form.hidden_tag() }}
+
+        {% for field in form if field.type != 'CSRFTokenField' and field.name != 'submit' %}
+            <div class="form-group">
+                <!-- Label -->
+                <label for="{{ field.id }}" class="form-label">
+                    {{ field.label.text }}
+                    {% if field.flags.required %}<span style="color: #ef4444;">*</span>{% endif %}
+                </label>
+
+                <!-- Field -->
+                {% if field.name == 'status' %}
+                    <!-- User Portal: Limited Status Options Only -->
+                    <select id="{{ field.id }}" name="{{ field.name }}" class="form-select" required>
+                        <option value="">-- Select Status --</option>
+                        <option value="Not Open Yet">Not Open Yet</option>
+                    </select>
+                    <div class="form-helper">
+                        <i class="fa-solid fa-info-circle"></i>
+                        Your ticket will be reviewed by our support team
+                    </div>
+                {% else %}
+                    {{ field(class="form-control") }}
+                {% endif %}
+
+                <!-- Errors -->
+                {% if field.errors %}
+                    <div class="form-errors">
+                        {% for error in field.errors %}
+                            <div class="flash danger">
+                                <i class="fa-solid fa-exclamation-circle"></i> {{ error }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+
+        <!-- Submit -->
+        <div class="form-actions">
+            <button type="submit" class="btn-submit">
+                <i class="fa-solid fa-paper-plane"></i> Submit Ticket
+            </button>
+        </div>
+    </form>
+
+    <!-- Footer -->
+    <div class="form-footer">
+        <a href="{{ url_for('user_dashboard') }}">
+            <i class="fa-solid fa-arrow-left"></i> Back to My Tickets
+        </a>
+    </div>
+</div>
+
+{% endblock %}

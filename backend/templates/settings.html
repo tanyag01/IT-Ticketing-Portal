@@ -1,0 +1,846 @@
+{% extends "layout.html" %}
+{% block title %}Settings - IT Ticketing Portal{% endblock %}
+
+{% block head %}
+<style>
+    /* Page Header */
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        padding: 24px;
+        background: var(--bg-card-final);
+        border: 1px solid var(--border-final);
+        border-radius: var(--card-radius);
+        box-shadow: 0 2px 8px var(--shadow-final);
+    }
+
+    .page-title {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--text-main);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .page-title i {
+        color: var(--brand);
+    }
+
+    .page-subtitle {
+        margin: 4px 0 0 0;
+        color: var(--text-muted-final);
+        font-size: 14px;
+    }
+
+    /* Settings Grid */
+    .settings-grid {
+        display: grid;
+        grid-template-columns: 250px 1fr;
+        gap: 24px;
+    }
+
+    /* Sidebar Navigation */
+    .settings-nav {
+        background: var(--bg-card-final);
+        border: 1px solid var(--border-final);
+        border-radius: var(--card-radius);
+        padding: 16px;
+        box-shadow: 0 2px 8px var(--shadow-final);
+        height: fit-content;
+        position: sticky;
+        top: 80px;
+    }
+
+    .settings-nav-title {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-muted-final);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 8px 12px;
+        margin-bottom: 8px;
+    }
+
+    .settings-nav-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        color: var(--text-main);
+        text-decoration: none;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        margin-bottom: 4px;
+    }
+
+    .settings-nav-item:hover {
+        background: rgba(30, 64, 175, 0.1);
+        color: var(--brand);
+    }
+
+    .settings-nav-item.active {
+        background: var(--brand);
+        color: white;
+    }
+
+    .settings-nav-item i {
+        width: 20px;
+        text-align: center;
+    }
+
+    /* Settings Content */
+    .settings-content {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    /* Settings Section */
+    .settings-section {
+        background: var(--bg-card-final);
+        border: 1px solid var(--border-final);
+        border-radius: var(--card-radius);
+        padding: 32px;
+        box-shadow: 0 2px 8px var(--shadow-final);
+    }
+
+    .section-header {
+        margin-bottom: 24px;
+        padding-bottom: 16px;
+        border-bottom: 2px solid var(--border-final);
+    }
+
+    .section-title {
+        font-size: 20px;
+        font-weight: 600;
+        color: var(--text-main);
+        margin: 0 0 8px 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .section-title i {
+        color: var(--brand);
+    }
+
+    .section-description {
+        color: var(--text-muted-final);
+        font-size: 14px;
+        margin: 0;
+    }
+
+    /* Setting Item */
+    .setting-item {
+        padding: 20px 0;
+        border-bottom: 1px solid var(--border-final);
+    }
+
+    .setting-item:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+
+    .setting-item:first-child {
+        padding-top: 0;
+    }
+
+    .setting-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 12px;
+    }
+
+    .setting-info h3 {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text-main);
+        margin: 0 0 4px 0;
+    }
+
+    .setting-info p {
+        font-size: 13px;
+        color: var(--text-muted-final);
+        margin: 0;
+        line-height: 1.5;
+    }
+
+    /* Theme Selector */
+    .theme-options {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-top: 12px;
+    }
+
+    .theme-option {
+        padding: 20px 16px;
+        border: 3px solid var(--border-final);
+        border-radius: 12px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: var(--bg-card-final);
+    }
+
+    .theme-option:hover {
+        border-color: var(--brand);
+        transform: translateY(-4px);
+        box-shadow: 0 8px 16px rgba(30, 64, 175, 0.2);
+    }
+
+    .theme-option.active {
+        border-color: var(--brand);
+        background: rgba(30, 64, 175, 0.1);
+        box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
+    }
+
+    .theme-icon {
+        font-size: 48px;
+        margin-bottom: 12px;
+    }
+
+    .theme-name {
+        font-weight: 600;
+        font-size: 15px;
+        color: var(--text-main);
+    }
+
+    /* Toggle Switch */
+    .toggle-switch {
+        position: relative;
+        width: 50px;
+        height: 26px;
+    }
+
+    .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .toggle-slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: var(--border-final);
+        border-radius: 26px;
+        transition: all 0.3s ease;
+    }
+
+    .toggle-slider:before {
+        position: absolute;
+        content: "";
+        height: 20px;
+        width: 20px;
+        left: 3px;
+        bottom: 3px;
+        background: white;
+        border-radius: 50%;
+        transition: all 0.3s ease;
+    }
+
+    .toggle-switch input:checked + .toggle-slider {
+        background: var(--brand);
+    }
+
+    .toggle-switch input:checked + .toggle-slider:before {
+        transform: translateX(24px);
+    }
+
+    /* User Profile Card */
+    .profile-card {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 24px;
+        background: linear-gradient(135deg, var(--brand), var(--brand-light));
+        border-radius: 12px;
+        color: white;
+        margin-bottom: 20px;
+    }
+
+    .profile-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        font-weight: 700;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .profile-info h2 {
+        margin: 0 0 4px 0;
+        font-size: 24px;
+        font-weight: 700;
+    }
+
+    .profile-info p {
+        margin: 0;
+        opacity: 0.9;
+        font-size: 14px;
+    }
+
+    /* Save Button */
+    .save-section {
+        padding-top: 24px;
+        border-top: 2px solid var(--border-final);
+        margin-top: 24px;
+    }
+
+    .btn-save {
+        padding: 12px 32px;
+        background: linear-gradient(135deg, var(--brand), #1e3a8a);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 15px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
+    }
+
+    .btn-save:hover {
+        background: linear-gradient(135deg, #1e3a8a, var(--brand));
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(30, 64, 175, 0.4);
+    }
+
+    .btn-save:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    /* Info Box */
+    .info-box {
+        padding: 14px 16px;
+        background: rgba(59, 130, 246, 0.1);
+        border: 1px solid rgba(59, 130, 246, 0.3);
+        border-radius: 8px;
+        color: #2563eb;
+        font-size: 13px;
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        margin-top: 12px;
+    }
+
+    .info-box i {
+        font-size: 16px;
+        margin-top: 2px;
+    }
+
+    /* Success Message */
+    .success-message {
+        padding: 14px 16px;
+        background: rgba(16, 185, 129, 0.1);
+        border: 1px solid rgba(16, 185, 129, 0.3);
+        border-radius: 8px;
+        color: #059669;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 20px;
+        animation: slideDown 0.3s ease;
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+        .settings-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .settings-nav {
+            position: static;
+            display: flex;
+            overflow-x: auto;
+            padding: 12px;
+        }
+
+        .settings-nav-title {
+            display: none;
+        }
+
+        .settings-nav-item {
+            white-space: nowrap;
+        }
+
+        .theme-options {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .page-header {
+            flex-direction: column;
+            gap: 16px;
+            align-items: flex-start;
+        }
+
+        .page-title {
+            font-size: 22px;
+        }
+
+        .settings-section {
+            padding: 20px;
+        }
+
+        .profile-card {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .setting-header {
+            flex-direction: column;
+            gap: 12px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Page Header -->
+<div class="page-header">
+    <div>
+        <h2 class="page-title">
+            <i class="fa-solid fa-gear"></i>
+            Settings
+        </h2>
+        <p class="page-subtitle">Customize your preferences and account settings</p>
+    </div>
+</div>
+
+<!-- Settings Grid -->
+<div class="settings-grid">
+    
+    <!-- Settings Navigation -->
+    <aside class="settings-nav">
+        <div class="settings-nav-title">Categories</div>
+        <a href="#appearance" class="settings-nav-item active" data-section="appearance">
+            <i class="fa-solid fa-palette"></i>
+            <span>Appearance</span>
+        </a>
+        <a href="#notifications" class="settings-nav-item" data-section="notifications">
+            <i class="fa-solid fa-bell"></i>
+            <span>Notifications</span>
+        </a>
+        <a href="#account" class="settings-nav-item" data-section="account">
+            <i class="fa-solid fa-user"></i>
+            <span>Account</span>
+        </a>
+        <a href="#preferences" class="settings-nav-item" data-section="preferences">
+            <i class="fa-solid fa-sliders"></i>
+            <span>Preferences</span>
+        </a>
+    </aside>
+
+    <!-- Settings Content -->
+    <div class="settings-content">
+
+        <!-- Success Message -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="success-message">
+                        <i class="fa-solid fa-check-circle"></i>
+                        <span>{{ message }}</span>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Appearance Settings -->
+        <section class="settings-section" id="appearance">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fa-solid fa-palette"></i>
+                    Appearance
+                </h2>
+                <p class="section-description">Customize how the application looks and feels</p>
+            </div>
+
+            <form method="POST" id="themeForm">
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <h3>Theme Preference</h3>
+                        <p>Choose your preferred color scheme for the interface</p>
+                    </div>
+
+                    <div class="theme-options">
+                        <label class="theme-option" for="theme-light">
+                            <input type="radio" name="theme" id="theme-light" value="light" style="display: none;">
+                            <div class="theme-icon">☀️</div>
+                            <div class="theme-name">Light</div>
+                        </label>
+
+                        <label class="theme-option" for="theme-dark">
+                            <input type="radio" name="theme" id="theme-dark" value="dark" style="display: none;">
+                            <div class="theme-icon">🌙</div>
+                            <div class="theme-name">Dark</div>
+                        </label>
+
+                        <label class="theme-option" for="theme-system">
+                            <input type="radio" name="theme" id="theme-system" value="system" style="display: none;">
+                            <div class="theme-icon">💻</div>
+                            <div class="theme-name">System</div>
+                        </label>
+                    </div>
+
+                    <div class="info-box">
+                        <i class="fa-solid fa-info-circle"></i>
+                        <span>System theme automatically matches your operating system preferences</span>
+                    </div>
+                </div>
+
+                <div class="save-section">
+                    <button type="submit" class="btn-save">
+                        <i class="fa-solid fa-save"></i>
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Notifications Settings -->
+        <section class="settings-section" id="notifications">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fa-solid fa-bell"></i>
+                    Notifications
+                </h2>
+                <p class="section-description">Manage how you receive updates and alerts</p>
+            </div>
+
+            <div class="setting-item">
+                <div class="setting-header">
+                    <div class="setting-info">
+                        <h3>Email Notifications</h3>
+                        <p>Receive email alerts for ticket updates and assignments</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="setting-item">
+                <div class="setting-header">
+                    <div class="setting-info">
+                        <h3>Ticket Status Updates</h3>
+                        <p>Get notified when your ticket status changes</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="setting-item">
+                <div class="setting-header">
+                    <div class="setting-info">
+                        <h3>New Comments</h3>
+                        <p>Receive alerts when someone comments on your tickets</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <i class="fa-solid fa-info-circle"></i>
+                <span>Email notification settings will be saved automatically</span>
+            </div>
+        </section>
+
+        <!-- Account Settings -->
+        <section class="settings-section" id="account">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fa-solid fa-user"></i>
+                    Account Information
+                </h2>
+                <p class="section-description">View and manage your account details</p>
+            </div>
+
+            <div class="profile-card">
+                <div class="profile-avatar">
+                    {{ current_user.name[0].upper() if current_user.name else 'U' }}
+                </div>
+                <div class="profile-info">
+                    <h2>{{ current_user.name }}</h2>
+                    <p>{{ current_user.email }}</p>
+                    <p style="margin-top: 8px;">
+                        <strong>Role:</strong> {{ current_user.role|capitalize }}
+                        {% if current_user.department %}
+                         • <strong>Department:</strong> {{ current_user.department }}
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+
+            <div class="setting-item">
+                <div class="setting-info">
+                    <h3>Account Status</h3>
+                    <p>Your account is currently active and in good standing</p>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <i class="fa-solid fa-lock"></i>
+                <span>To update your email or password, please contact your administrator</span>
+            </div>
+        </section>
+
+        <!-- Preferences Settings -->
+        <section class="settings-section" id="preferences">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fa-solid fa-sliders"></i>
+                    Preferences
+                </h2>
+                <p class="section-description">Customize your experience</p>
+            </div>
+
+            <div class="setting-item">
+                <div class="setting-header">
+                    <div class="setting-info">
+                        <h3>Compact View</h3>
+                        <p>Display more information in less space</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="setting-item">
+                <div class="setting-header">
+                    <div class="setting-info">
+                        <h3>Show Resolved Tickets</h3>
+                        <p>Include resolved tickets in your dashboard view</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="setting-item">
+                <div class="setting-header">
+                    <div class="setting-info">
+                        <h3>Auto-refresh Dashboard</h3>
+                        <p>Automatically update dashboard every 30 seconds</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function() {
+    'use strict';
+
+    // ==================== NAVIGATION ====================
+    const navItems = document.querySelectorAll('.settings-nav-item');
+    const sections = document.querySelectorAll('.settings-section');
+
+    navItems.forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Update active state
+            navItems.forEach(nav => nav.classList.remove('active'));
+            this.classList.add('active');
+
+            // Scroll to section
+            const sectionId = this.dataset.section;
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+    });
+
+    // ==================== THEME SELECTION ====================
+    const themeOptions = document.querySelectorAll('.theme-option');
+    const themeInputs = document.querySelectorAll('input[name="theme"]');
+    
+    // Get current theme from localStorage
+    const currentTheme = localStorage.getItem('theme') || 'system';
+    
+    // Set active theme on page load
+    themeOptions.forEach(option => {
+        const input = option.querySelector('input[name="theme"]');
+        if (input && input.value === currentTheme) {
+            option.classList.add('active');
+            input.checked = true;
+        }
+    });
+    
+    // Theme option click handler
+    themeOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            const input = this.querySelector('input[name="theme"]');
+            if (!input) return;
+            
+            const selectedTheme = input.value;
+            
+            // Remove active from all
+            themeOptions.forEach(opt => opt.classList.remove('active'));
+            
+            // Add active to selected
+            this.classList.add('active');
+            
+            // Check the radio button
+            input.checked = true;
+            
+            // Apply theme IMMEDIATELY
+            applyTheme(selectedTheme);
+            
+            // Save to localStorage
+            localStorage.setItem('theme', selectedTheme);
+            
+            // Show success message
+            showToast('Theme applied successfully!', 'success');
+        });
+    });
+    
+    // Function to apply theme
+    function applyTheme(theme) {
+        if (theme === 'system') {
+            const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            document.documentElement.setAttribute('data-theme', systemDark ? 'dark' : 'light');
+            
+            // Update theme toggle button in topbar
+            const themeBtn = document.getElementById('themeToggle');
+            if (themeBtn) {
+                themeBtn.textContent = systemDark ? '☀️' : '🌙';
+            }
+        } else {
+            document.documentElement.setAttribute('data-theme', theme);
+            
+            // Update theme toggle button in topbar
+            const themeBtn = document.getElementById('themeToggle');
+            if (themeBtn) {
+                themeBtn.textContent = theme === 'dark' ? '☀️' : '🌙';
+            }
+        }
+    }
+
+    // ==================== FORM SUBMISSION ====================
+    const themeForm = document.getElementById('themeForm');
+    if (themeForm) {
+        themeForm.addEventListener('submit', function(e) {
+            e.preventDefault(); // Prevent form submission
+            
+            const submitBtn = this.querySelector('.btn-save');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+            }
+            
+            // Get selected theme
+            const selectedTheme = document.querySelector('input[name="theme"]:checked')?.value || 'system';
+            
+            // Apply theme
+            applyTheme(selectedTheme);
+            localStorage.setItem('theme', selectedTheme);
+            
+            // Re-enable button
+            setTimeout(() => {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fa-solid fa-check"></i> Saved!';
+                }
+                showToast('Settings saved successfully!', 'success');
+                
+                // Reset button text after 2 seconds
+                setTimeout(() => {
+                    if (submitBtn) {
+                        submitBtn.innerHTML = '<i class="fa-solid fa-save"></i> Save Changes';
+                    }
+                }, 2000);
+            }, 500);
+        });
+    }
+
+    // ==================== TOGGLE SWITCHES ====================
+    const toggles = document.querySelectorAll('.toggle-switch input');
+    toggles.forEach(toggle => {
+        toggle.addEventListener('change', function() {
+            // Simulate auto-save
+            showToast('Preference updated', 'success');
+        });
+    });
+
+    // ==================== SCROLL SPY ====================
+    window.addEventListener('scroll', function() {
+        let current = '';
+        
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            const sectionHeight = section.clientHeight;
+            if (window.pageYOffset >= sectionTop - 100) {
+                current = section.getAttribute('id');
+            }
+        });
+
+        navItems.forEach(item => {
+            item.classList.remove('active');
+            if (item.dataset.section === current) {
+                item.classList.add('active');
+            }
+        });
+    });
+
+})();
+</script>
+{% endblock %}

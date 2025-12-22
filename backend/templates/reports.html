@@ -1,0 +1,684 @@
+{% extends "layout.html" %}
+{% block title %}Reports - IT Ticketing Portal{% endblock %}
+
+{% block head %}
+<style>
+    /* Page Header */
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        padding: 24px;
+        background: var(--bg-card-final);
+        border: 1px solid var(--border-final);
+        border-radius: var(--card-radius);
+        box-shadow: 0 2px 8px var(--shadow-final);
+    }
+
+    .page-title {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--text-main);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .page-title i {
+        color: var(--brand);
+    }
+
+    .page-subtitle {
+        margin: 4px 0 0 0;
+        color: var(--text-muted-final);
+        font-size: 14px;
+    }
+
+    /* Filter Card */
+    .filter-card {
+        background: var(--bg-card-final);
+        border: 1px solid var(--border-final);
+        border-radius: var(--card-radius);
+        padding: 24px;
+        box-shadow: 0 2px 8px var(--shadow-final);
+        margin-bottom: 24px;
+    }
+
+    .filter-header {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text-main);
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .filter-header i {
+        color: var(--brand);
+    }
+
+    .filter-form {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+        align-items: flex-end;
+    }
+
+    .filter-group {
+        flex: 1;
+        min-width: 200px;
+    }
+
+    .filter-group label {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-main);
+        margin-bottom: 8px;
+    }
+
+    .filter-input {
+        width: 100%;
+        padding: 10px 14px;
+        border: 1px solid var(--border-final);
+        border-radius: 8px;
+        background: var(--bg-main);
+        color: var(--text-main);
+        font-size: 14px;
+    }
+
+    .filter-input:focus {
+        outline: none;
+        border-color: var(--brand);
+        box-shadow: 0 0 0 3px rgba(10, 75, 120, 0.1);
+    }
+
+    .filter-actions {
+        display: flex;
+        gap: 10px;
+        margin-left: auto;
+    }
+
+    .btn {
+        padding: 10px 18px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+        border: none;
+        font-size: 14px;
+        white-space: nowrap;
+    }
+
+    .btn-solid {
+        background: var(--brand);
+        color: white;
+    }
+
+    .btn-solid:hover {
+        background: var(--brand-light);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(10, 75, 120, 0.3);
+    }
+
+    .btn-outline {
+        background: transparent;
+        color: var(--text-main);
+        border: 1px solid var(--border-final);
+    }
+
+    .btn-outline:hover {
+        background: rgba(10, 75, 120, 0.1);
+        border-color: var(--brand);
+        color: var(--brand);
+    }
+
+    /* Stats Summary */
+    .stats-summary {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .stat-item {
+        background: var(--bg-card-final);
+        border: 1px solid var(--border-final);
+        border-radius: 10px;
+        padding: 16px;
+        text-align: center;
+    }
+
+    .stat-value {
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--text-main);
+    }
+
+    .stat-label {
+        font-size: 13px;
+        color: var(--text-muted-final);
+        margin-top: 4px;
+    }
+
+    /* Table Card */
+    .table-card {
+        background: var(--bg-card-final);
+        border: 1px solid var(--border-final);
+        border-radius: var(--card-radius);
+        padding: 24px;
+        box-shadow: 0 2px 8px var(--shadow-final);
+    }
+
+    .table-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 16px;
+        border-bottom: 2px solid var(--border-final);
+    }
+
+    .table-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--text-main);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .table-title i {
+        color: var(--brand);
+    }
+
+    /* Table */
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    .reports-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+    }
+
+    .reports-table thead th {
+        padding: 12px 10px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 12px;
+        color: var(--text-main);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 2px solid var(--border-final);
+        background: var(--bg-main);
+        white-space: nowrap;
+    }
+
+    .reports-table tbody td {
+        padding: 14px 10px;
+        border-bottom: 1px solid var(--border-final);
+        color: var(--text-main);
+    }
+
+    .reports-table tbody tr:hover {
+        background: rgba(10, 75, 120, 0.05);
+    }
+
+    /* Ticket Number */
+    .ticket-no {
+        font-family: 'Courier New', monospace;
+        font-weight: 600;
+        color: var(--brand);
+    }
+
+    /* Badges */
+    .badge {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        white-space: nowrap;
+    }
+
+    .badge-open { background: #fef3c7; color: #92400e; }
+    .badge-progress { background: #dbeafe; color: #1e40af; }
+    .badge-resolved { background: #d1fae5; color: #065f46; }
+    .badge-closed { background: #e5e7eb; color: #374151; }
+
+    .badge-low { background: #d1fae5; color: #065f46; }
+    .badge-medium { background: #fef3c7; color: #92400e; }
+    .badge-high { background: #fed7aa; color: #9a3412; }
+    .badge-critical { background: #fecaca; color: #991b1b; }
+
+    .badge-met { background: #d1fae5; color: #065f46; }
+    .badge-breached { background: #fecaca; color: #991b1b; }
+    .badge-at-risk { background: #fef3c7; color: #92400e; }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: var(--text-muted-final);
+    }
+
+    .empty-state i {
+        font-size: 64px;
+        opacity: 0.3;
+        margin-bottom: 16px;
+    }
+
+    .empty-state h3 {
+        font-size: 20px;
+        margin-bottom: 8px;
+        color: var(--text-main);
+    }
+
+    /* Loading Indicator */
+    .loading-overlay {
+        text-align: center;
+        padding: 40px;
+        color: var(--text-muted-final);
+    }
+
+    .spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid var(--border-final);
+        border-top-color: var(--brand);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+        margin: 0 auto 16px;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    /* Aging Color Coding */
+    .aging-normal { color: #10b981; }
+    .aging-warning { color: #f59e0b; }
+    .aging-critical { color: #ef4444; }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+        .filter-form {
+            flex-direction: column;
+        }
+
+        .filter-group {
+            width: 100%;
+        }
+
+        .filter-actions {
+            width: 100%;
+            margin-left: 0;
+        }
+
+        .btn {
+            flex: 1;
+            justify-content: center;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .page-header {
+            flex-direction: column;
+            gap: 16px;
+            align-items: flex-start;
+        }
+
+        .page-title {
+            font-size: 22px;
+        }
+
+        .stats-summary {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        /* Mobile table - horizontal scroll */
+        .table-responsive {
+            overflow-x: scroll;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .reports-table {
+            min-width: 1000px;
+        }
+    }
+
+    /* Print Styles */
+    @media print {
+        .filter-card,
+        .sidebar,
+        .topbar,
+        .btn {
+            display: none !important;
+        }
+
+        .table-card {
+            box-shadow: none;
+            border: 1px solid #000;
+        }
+
+        .reports-table thead th {
+            background: #f0f0f0 !important;
+            color: #000 !important;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Page Header -->
+<div class="page-header">
+    <div>
+        <h2 class="page-title">
+            <i class="fa-solid fa-chart-bar"></i>
+            Ticket Reports
+        </h2>
+        <p class="page-subtitle">Generate comprehensive ticket performance reports and analytics</p>
+    </div>
+</div>
+
+<!-- Filter Card -->
+<div class="filter-card">
+    <div class="filter-header">
+        <i class="fa-solid fa-filter"></i>
+        Report Filters
+    </div>
+    
+    <form method="GET" action="{{ url_for('reports') }}" class="filter-form">
+        
+        <div class="filter-group">
+            <label for="month">
+                <i class="fa-solid fa-calendar"></i> Select Month
+            </label>
+            <input type="month" 
+                   id="month"
+                   name="month" 
+                   class="filter-input"
+                   value="{{ request.args.get('month', '') }}">
+        </div>
+
+        <div class="filter-actions">
+            <button type="submit" class="btn btn-solid">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                Apply Filter
+            </button>
+
+            {% if request.args.get('month') %}
+            <a href="{{ url_for('reports') }}" class="btn btn-outline">
+                <i class="fa-solid fa-xmark"></i>
+                Clear
+            </a>
+            {% endif %}
+
+            <a href="{{ url_for('reports', month=request.args.get('month', ''), export='csv') }}" 
+               class="btn btn-solid">
+                <i class="fa-solid fa-download"></i>
+                Export CSV
+            </a>
+        </div>
+    </form>
+</div>
+
+<!-- Summary Stats -->
+{% if tickets %}
+<div class="stats-summary">
+    <div class="stat-item">
+        <div class="stat-value">{{ tickets|length }}</div>
+        <div class="stat-label">Total Tickets</div>
+    </div>
+    <div class="stat-item">
+        <div class="stat-value">{{ tickets|selectattr('status', 'equalto', 'Open')|list|length }}</div>
+        <div class="stat-label">Open</div>
+    </div>
+    <div class="stat-item">
+        <div class="stat-value">{{ tickets|selectattr('status', 'equalto', 'In Progress')|list|length }}</div>
+        <div class="stat-label">In Progress</div>
+    </div>
+    <div class="stat-item">
+        <div class="stat-value">{{ tickets|selectattr('status', 'equalto', 'Closed')|list|length }}</div>
+        <div class="stat-label">Closed</div>
+    </div>
+    <div class="stat-item">
+        <div class="stat-value">{{ tickets|selectattr('priority', 'equalto', 'Critical')|list|length }}</div>
+        <div class="stat-label">Critical Priority</div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Reports Table -->
+<div class="table-card">
+    <div class="table-header">
+        <h3 class="table-title">
+            <i class="fa-solid fa-table"></i>
+            Detailed Report
+            {% if request.args.get('month') %}
+                <span style="font-weight: normal; font-size: 14px; color: var(--text-muted-final);">
+                    ({{ request.args.get('month') }})
+                </span>
+            {% endif %}
+        </h3>
+    </div>
+
+    {% if tickets %}
+    <div class="table-responsive">
+        <table class="reports-table" id="reportsTable">
+            <thead>
+                <tr>
+                    <th>Ticket #</th>
+                    <th>Created</th>
+                    <th>User</th>
+                    <th>Type</th>
+                    <th>Category</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                    <th>Assignee</th>
+                    <th>Due Date</th>
+                    <th>Closed Date</th>
+                    <th>SLA Status</th>
+                    <th>Aging (days)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for t in tickets %}
+                <tr>
+                    <td><span class="ticket-no">#{{ t.ticket_no or 'T-' + t.id|string }}</span></td>
+                    
+                    <td>{{ t.created_at.strftime('%b %d, %Y') if t.created_at else 'N/A' }}</td>
+                    
+                    <td>{{ t.user.name if t.user else 'N/A' }}</td>
+                    
+                    <td>{{ t.ticket_type or 'N/A' }}</td>
+                    
+                    <td>{{ t.category or 'Uncategorized' }}</td>
+                    
+                    <td>
+                        <span class="badge badge-{{ t.priority|lower }}">
+                            {{ t.priority }}
+                        </span>
+                    </td>
+                    
+                    <td>
+                        <span class="badge badge-{{ t.status|lower|replace(' ', '-') }}">
+                            {{ t.status }}
+                        </span>
+                    </td>
+                    
+                    <td>
+                        {% if t.assignee %}
+                            {{ t.assignee.name }}
+                        {% elif t.assignee_name %}
+                            {{ t.assignee_name }}
+                        {% else %}
+                            <em style="color: var(--text-muted-final);">Unassigned</em>
+                        {% endif %}
+                    </td>
+                    
+                    <td>
+                        {% if t.due_date %}
+                            {{ t.due_date.strftime('%b %d, %Y') }}
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+                    
+                    <td>
+                        {% if t.closed_at %}
+                            {{ t.closed_at.strftime('%b %d, %Y') }}
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+                    
+                    <td>
+                        {% if t.sla_state %}
+                            <span class="badge badge-{{ t.sla_state|lower|replace(' ', '-') }}">
+                                {{ t.sla_state }}
+                            </span>
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+                    
+                    <td>
+                        {% if t.aging is defined and t.aging is not none %}
+                            <span class="{% if t.aging > 7 %}aging-critical{% elif t.aging > 3 %}aging-warning{% else %}aging-normal{% endif %}">
+                                {{ t.aging }}
+                            </span>
+                        {% else %}
+                            {% set aging = ((now() - t.created_at).days) if t.created_at and t.status != 'Closed' else 0 %}
+                            <span class="{% if aging > 7 %}aging-critical{% elif aging > 3 %}aging-warning{% else %}aging-normal{% endif %}">
+                                {{ aging }}
+                            </span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <i class="fa-solid fa-chart-line"></i>
+        <h3>No Reports Available</h3>
+        <p>
+            {% if request.args.get('month') %}
+                No tickets found for the selected period.
+            {% else %}
+                Select a month to generate reports or view all tickets.
+            {% endif %}
+        </p>
+        {% if request.args.get('month') %}
+        <a href="{{ url_for('reports') }}" class="btn btn-solid" style="margin-top: 20px;">
+            <i class="fa-solid fa-eye"></i>
+            View All Tickets
+        </a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function() {
+    'use strict';
+
+    // Table sorting functionality
+    const table = document.getElementById('reportsTable');
+    if (table) {
+        const headers = table.querySelectorAll('thead th');
+        
+        headers.forEach((header, index) => {
+            header.style.cursor = 'pointer';
+            header.title = 'Click to sort';
+            
+            header.addEventListener('click', function() {
+                sortTable(index);
+            });
+        });
+    }
+
+    function sortTable(columnIndex) {
+        const tbody = table.querySelector('tbody');
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        
+        // Determine sort direction
+        const currentDirection = table.dataset.sortDirection || 'asc';
+        const newDirection = currentDirection === 'asc' ? 'desc' : 'asc';
+        table.dataset.sortDirection = newDirection;
+        
+        // Sort rows
+        rows.sort((a, b) => {
+            const aValue = a.cells[columnIndex].textContent.trim();
+            const bValue = b.cells[columnIndex].textContent.trim();
+            
+            // Try to parse as number
+            const aNum = parseFloat(aValue);
+            const bNum = parseFloat(bValue);
+            
+            if (!isNaN(aNum) && !isNaN(bNum)) {
+                return newDirection === 'asc' ? aNum - bNum : bNum - aNum;
+            }
+            
+            // Sort as string
+            return newDirection === 'asc' 
+                ? aValue.localeCompare(bValue)
+                : bValue.localeCompare(aValue);
+        });
+        
+        // Re-append sorted rows
+        rows.forEach(row => tbody.appendChild(row));
+        
+        // Update header indicators
+        headers.forEach((h, i) => {
+            h.classList.remove('sort-asc', 'sort-desc');
+            if (i === columnIndex) {
+                h.classList.add(`sort-${newDirection}`);
+            }
+        });
+        
+        window.showToast(`Sorted by ${headers[columnIndex].textContent}`, 'info');
+    }
+
+    // Auto-set current month if no filter selected
+    const monthInput = document.getElementById('month');
+    if (monthInput && !monthInput.value) {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        // Don't auto-fill, let user choose
+    }
+
+    // Print functionality
+    window.printReport = function() {
+        window.print();
+    };
+
+    // Export notification
+    const exportLinks = document.querySelectorAll('a[href*="export=csv"]');
+    exportLinks.forEach(link => {
+        link.addEventListener('click', function() {
+            window.showToast('Preparing CSV export...', 'info');
+        });
+    });
+
+})();
+</script>
+{% endblock %}
