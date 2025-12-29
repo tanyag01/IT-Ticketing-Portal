@@ -38,18 +38,29 @@ IT-Ticketing-Portal/
 │
 ├── backend/
 │   ├── app.py
+
 │   ├── config.py
+
 │   ├── models.py
+
 │   ├── forms.py
+
 │   ├── utils.py
+
 │   ├── tasks.py
+
 │   ├── db_init.py
+
 │   ├── requirements.txt
+
 │   ├── migrations/
+
 │   ├── templates/
+
 │   └── static/
 │
 ├── .gitignore
+
 └── README.md
 
 ⚙️ Local Installation & Setup
