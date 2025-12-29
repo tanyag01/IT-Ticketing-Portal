@@ -36,7 +36,9 @@ The system enables employees to raise IT support tickets, track progress, and co
 📂 Project Structure
 IT-Ticketing-Portal/
 │
+
 ├── backend/
+
 │   ├── app.py
 
 │   ├── config.py
