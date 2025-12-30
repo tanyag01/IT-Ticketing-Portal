@@ -3,274 +3,218 @@
 
 {% block head %}
 <style>
-    /* Page Header */
+    /* ✨ Page Container */
+    .ticket-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 32px 0;
+    }
+
+    /* ✨ Ticket Header */
     .ticket-header {
         background: var(--bg-card-final);
-        border: 1px solid var(--border-final);
-        border-radius: var(--card-radius);
-        padding: 32px;
-        box-shadow: 0 2px 8px var(--shadow-final);
-        margin-bottom: 24px;
+        border: 1.5px solid var(--border-final);
+        border-radius: 18px;
+        padding: 36px;
+        box-shadow: 0 4px 12px var(--shadow-final);
+        margin-bottom: 32px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .ticket-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #1e40af, #8b5cf6, #10b981);
+        background-size: 200% 100%;
+        animation: shimmer 3s ease-in-out infinite;
+    }
+
+    @keyframes shimmer {
+        0%, 100% { background-position: 200% 0; }
+        50% { background-position: -200% 0; }
     }
 
     .ticket-header-top {
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
-        margin-bottom: 20px;
+        margin-bottom: 24px;
         flex-wrap: wrap;
-        gap: 16px;
+        gap: 20px;
     }
 
     .ticket-id-section h1 {
         margin: 0;
-        font-size: 32px;
-        font-weight: 700;
+        font-size: 36px;
+        font-weight: 900;
         color: var(--text-main);
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 14px;
+        letter-spacing: -0.02em;
     }
 
     .ticket-id-section h1 i {
-        color: var(--brand);
+        color: #1e40af;
+        font-size: 40px;
     }
 
     .ticket-number {
         font-family: 'Courier New', monospace;
-        color: var(--brand);
+        color: #1e40af;
+        font-weight: 800;
     }
 
-    /* Status Badge */
+    /* ✨ Status Badge */
     .status-badge-large {
-        padding: 10px 20px;
-        border-radius: 8px;
+        padding: 12px 28px;
+        border-radius: 12px;
         font-size: 14px;
-        font-weight: 600;
+        font-weight: 800;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
+        letter-spacing: 0.6px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
 
     .status-open { background: #fef3c7; color: #92400e; }
-    .status-progress { background: #dbeafe; color: #1e40af; }
+    .status-in-progress { background: #dbeafe; color: #1e40af; }
+    .status-closed { background: #d1fae5; color: #065f46; }
     .status-resolved { background: #d1fae5; color: #065f46; }
-    .status-closed { background: #e5e7eb; color: #374151; }
-    .status-re-open { background: #fecaca; color: #991b1b; }       /* Red */
-    .status-not-open-yet { background: #e5e7eb; color: #374151; } /* Neutral gray */
+    .status-not-open-yet { background: #e5e7eb; color: #374151; }
+    .status-re-open { background: #fecaca; color: #991b1b; }
 
-
-    /* Meta Tags */
+    /* ✨ Meta Tags */
     .ticket-meta {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px;
-        margin-top: 16px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 16px;
+        margin-top: 20px;
     }
 
     .meta-chip {
-        padding: 8px 14px;
-        background: var(--bg-main);
-        border: 1px solid var(--border-final);
-        border-radius: 8px;
+        padding: 14px 16px;
+        background: var(--bg-surface);
+        border: 1.5px solid var(--border-final);
+        border-radius: 12px;
         font-size: 13px;
         display: flex;
         align-items: center;
-        gap: 8px;
-        color: var(--text-main);
-    }
-
-    .meta-chip i {
-        color: var(--brand);
-    }
-
-    .meta-chip.sla-met { border-color: #10b981; background: rgba(16, 185, 129, 0.1); }
-    .meta-chip.sla-breached { border-color: #ef4444; background: rgba(239, 68, 68, 0.1); }
-    .meta-chip.sla-at-risk { border-color: #f59e0b; background: rgba(245, 158, 11, 0.1); }
-
-    /* Description */
-    .ticket-description {
-        margin-top: 20px;
-        padding: 20px;
-        background: var(--bg-main);
-        border-radius: 8px;
-        line-height: 1.7;
-        color: var(--text-main);
-    }
-
-    .description-label {
-        font-weight: 600;
-        font-size: 14px;
-        color: var(--text-muted-final);
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 8px;
-        display: block;
-    }
-
-    /* Attachments */
-    .attachments-section {
-        margin-top: 24px;
-        padding-top: 24px;
-        border-top: 1px solid var(--border-final);
-    }
-
-    .attachments-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 12px;
-        margin-top: 12px;
-    }
-
-    .attachment-item {
-        display: flex;
-        align-items: center;
         gap: 10px;
-        padding: 12px;
-        background: var(--bg-main);
-        border: 1px solid var(--border-final);
-        border-radius: 8px;
-        text-decoration: none;
         color: var(--text-main);
+        font-weight: 600;
         transition: all 0.3s ease;
     }
 
-    .attachment-item:hover {
-        border-color: var(--brand);
-        background: rgba(10, 75, 120, 0.05);
-        color: var(--brand);
+    .meta-chip:hover {
+        border-color: #1e40af;
+        box-shadow: 0 4px 12px rgba(30, 64, 175, 0.2);
     }
 
-    .attachment-item i {
-        font-size: 20px;
-        color: var(--brand);
+    .meta-chip i {
+        color: #1e40af;
+        font-size: 16px;
+        width: 16px;
     }
 
-    /* Update Panel */
-    .update-panel {
-        background: var(--bg-card-final);
+    .meta-chip strong {
+        display: block;
+        font-weight: 800;
+        margin-bottom: 2px;
+    }
+
+    .meta-chip span {
+        display: block;
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--text-muted-final);
+    }
+
+    /* ✨ Description */
+    .ticket-description {
+        margin-top: 24px;
+        padding: 20px;
+        background: var(--bg-surface);
+        border-radius: 12px;
+        line-height: 1.8;
+        color: var(--text-main);
         border: 1px solid var(--border-final);
-        border-radius: var(--card-radius);
-        padding: 32px;
-        box-shadow: 0 2px 8px var(--shadow-final);
-        margin-bottom: 24px;
     }
 
-    .panel-title {
+    .description-label {
+        font-weight: 800;
+        font-size: 13px;
+        color: var(--text-muted-final);
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        margin-bottom: 10px;
+        display: block;
+    }
+
+    /* ✨ Main Grid */
+    .ticket-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 32px;
+        margin-bottom: 32px;
+    }
+
+    /* ✨ Comments Section */
+    .comments-section {
+        background: var(--bg-card-final);
+        border: 1.5px solid var(--border-final);
+        border-radius: 18px;
+        padding: 36px;
+        box-shadow: 0 4px 12px var(--shadow-final);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .comments-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #1e40af, #8b5cf6);
+        background-size: 200% 100%;
+        animation: shimmer 3s ease-in-out infinite;
+    }
+
+    .section-title {
         font-size: 20px;
-        font-weight: 600;
+        font-weight: 800;
         color: var(--text-main);
         margin: 0 0 24px 0;
         display: flex;
         align-items: center;
-        gap: 10px;
-        padding-bottom: 16px;
+        gap: 12px;
+        padding-bottom: 18px;
         border-bottom: 2px solid var(--border-final);
     }
 
-    .panel-title i {
-        color: var(--brand);
-    }
-
-    /* Form */
-    .form-group {
-        margin-bottom: 20px;
-    }
-
-    .form-label {
-        display: block;
-        font-weight: 600;
-        color: var(--text-main);
-        margin-bottom: 8px;
-        font-size: 14px;
-    }
-
-    .form-control, .form-select {
-        width: 100%;
-        padding: 12px 14px;
-        border: 1px solid var(--border-final);
-        border-radius: 8px;
-        background: var(--bg-main);
-        color: var(--text-main);
-        font-size: 14px;
-        transition: all 0.3s ease;
-    }
-
-    .form-control:focus, .form-select:focus {
-        outline: none;
-        border-color: var(--brand);
-        box-shadow: 0 0 0 3px rgba(10, 75, 120, 0.1);
-    }
-
-    textarea.form-control {
-        resize: vertical;
-        min-height: 100px;
-    }
-
-    /* Form Actions */
-    .form-actions {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: 24px;
-        padding-top: 24px;
-        border-top: 2px solid var(--border-final);
-    }
-
-    .btn-back {
-        color: var(--text-muted-final);
-        text-decoration: none;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        transition: color 0.3s ease;
-    }
-
-    .btn-back:hover {
-        color: var(--brand);
-    }
-
-    .btn-submit {
-        padding: 12px 32px;
-        background: var(--brand);
-        color: white;
-        border: none;
-        border-radius: 8px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        box-shadow: 0 4px 12px rgba(10, 75, 120, 0.3);
-    }
-
-    .btn-submit:hover {
-        background: var(--brand-light);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 16px rgba(10, 75, 120, 0.4);
-    }
-
-    /* Comments Section */
-    .comments-section {
-        background: var(--bg-card-final);
-        border: 1px solid var(--border-final);
-        border-radius: var(--card-radius);
-        padding: 32px;
-        box-shadow: 0 2px 8px var(--shadow-final);
+    .section-title i {
+        color: #1e40af;
+        font-size: 22px;
     }
 
     .comment-item {
         padding: 20px;
-        background: var(--bg-main);
-        border: 1px solid var(--border-final);
-        border-radius: 10px;
+        background: var(--bg-surface);
+        border: 1.5px solid var(--border-final);
+        border-radius: 12px;
         margin-bottom: 16px;
         transition: all 0.3s ease;
     }
 
     .comment-item:hover {
-        border-color: var(--brand);
-        box-shadow: 0 2px 8px var(--shadow-final);
+        border-color: #1e40af;
+        box-shadow: 0 4px 12px rgba(30, 64, 175, 0.15);
     }
 
     .comment-item:last-child {
@@ -282,53 +226,96 @@
         justify-content: space-between;
         align-items: center;
         margin-bottom: 12px;
+        flex-wrap: wrap;
+        gap: 12px;
     }
 
     .comment-author {
         display: flex;
         align-items: center;
         gap: 10px;
-        font-weight: 600;
+        font-weight: 800;
         color: var(--text-main);
     }
 
     .comment-author i {
-        font-size: 20px;
-        color: var(--brand);
+        font-size: 18px;
+        color: #1e40af;
     }
 
     .comment-time {
         font-size: 12px;
         color: var(--text-muted-final);
+        font-weight: 600;
     }
 
     .comment-text {
         color: var(--text-main);
-        line-height: 1.6;
+        line-height: 1.7;
         margin: 0;
+        font-size: 14px;
     }
 
-    /* Empty State */
-    .empty-state {
-        text-align: center;
-        padding: 40px 20px;
+    /* ✨ Sidebar */
+    .sidebar-section {
+        background: var(--bg-card-final);
+        border: 1.5px solid var(--border-final);
+        border-radius: 18px;
+        padding: 24px;
+        box-shadow: 0 4px 12px var(--shadow-final);
+        margin-bottom: 24px;
+    }
+
+    .sidebar-title {
+        font-size: 16px;
+        font-weight: 800;
+        color: var(--text-main);
+        margin: 0 0 18px 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding-bottom: 14px;
+        border-bottom: 2px solid var(--border-final);
+    }
+
+    .sidebar-title i {
+        color: #1e40af;
+        font-size: 18px;
+    }
+
+    .sidebar-info {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        font-size: 13px;
+        line-height: 1.8;
+        color: var(--text-main);
+        font-weight: 500;
+    }
+
+    .info-row {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .info-row strong {
+        font-weight: 800;
+        font-size: 12px;
         color: var(--text-muted-final);
-    }
-
-    .empty-state i {
-        font-size: 48px;
-        opacity: 0.3;
-        margin-bottom: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
     }
 
     /* Priority Badge */
     .priority-badge {
-        padding: 5px 10px;
-        border-radius: 6px;
+        padding: 6px 12px;
+        border-radius: 8px;
         font-size: 11px;
-        font-weight: 600;
+        font-weight: 800;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
+        letter-spacing: 0.05em;
+        display: inline-block;
     }
 
     .priority-low { background: #d1fae5; color: #065f46; }
@@ -336,321 +323,465 @@
     .priority-high { background: #fed7aa; color: #9a3412; }
     .priority-critical { background: #fecaca; color: #991b1b; }
 
-    /* Responsive */
-    @media (max-width: 768px) {
-        .ticket-header {
-            padding: 20px;
-        }
+    /* ✨ Form Section */
+    .update-section {
+        background: var(--bg-card-final);
+        border: 1.5px solid var(--border-final);
+        border-radius: 18px;
+        padding: 36px;
+        box-shadow: 0 4px 12px var(--shadow-final);
+        margin-bottom: 32px;
+        position: relative;
+        overflow: hidden;
+    }
 
-        .ticket-header-top {
-            flex-direction: column;
-        }
+    .update-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #10b981, #059669);
+        background-size: 200% 100%;
+        animation: shimmer 3s ease-in-out infinite;
+    }
 
-        .ticket-id-section h1 {
-            font-size: 24px;
-        }
+    .form-group {
+        margin-bottom: 24px;
+    }
 
-        .ticket-meta {
-            flex-direction: column;
-        }
+    .form-label {
+        display: block;
+        font-weight: 700;
+        color: var(--text-main);
+        margin-bottom: 10px;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
 
-        .meta-chip {
-            width: 100%;
-        }
+    .form-label i {
+        color: #10b981;
+        font-size: 16px;
+    }
 
-        .form-actions {
-            flex-direction: column;
-            gap: 16px;
-        }
+    .form-control, .form-select {
+        width: 100%;
+        padding: 13px 16px;
+        border: 1.5px solid var(--border-final);
+        border-radius: 12px;
+        background: var(--bg-surface);
+        color: var(--text-main);
+        font-size: 14px;
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        font-family: inherit;
+        font-weight: 500;
+    }
 
-        .btn-back {
-            width: 100%;
-            justify-content: center;
-        }
+    .form-control:focus, .form-select:focus {
+        outline: none;
+        border-color: #10b981;
+        box-shadow: 0 0 0 5px rgba(16, 185, 129, 0.15);
+        transform: translateY(-2px);
+    }
 
-        .btn-submit {
-            width: 100%;
-            justify-content: center;
-        }
+    textarea.form-control {
+        resize: vertical;
+        min-height: 120px;
+    }
+
+    /* ✨ Form Actions */
+    .form-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 28px;
+        padding-top: 24px;
+        border-top: 2px solid var(--border-final);
+        gap: 16px;
+    }
+
+    .btn-back {
+        color: var(--text-muted-final);
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        font-weight: 700;
+        padding: 12px 16px;
+        border-radius: 10px;
+    }
+
+    .btn-back:hover {
+        color: #1e40af;
+        background: rgba(30, 64, 175, 0.08);
+    }
+
+    .btn-submit {
+        padding: 13px 32px;
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-weight: 800;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-submit:hover:not(:disabled) {
+        background: linear-gradient(135deg, #059669, #047857);
+        transform: translateY(-3px);
+        box-shadow: 0 12px 28px rgba(16, 185, 129, 0.4);
+    }
+
+    .btn-submit:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+
+    .btn-submit i {
+        transition: transform 0.3s ease;
+    }
+
+    .btn-submit:hover:not(:disabled) i {
+        transform: translateX(4px);
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 50px 20px;
+        color: var(--text-muted-final);
+    }
+
+    .empty-state i {
+        font-size: 56px;
+        opacity: 0.2;
+        margin-bottom: 16px;
+        display: block;
+    }
+
+    .empty-state p {
+        margin: 0;
+        font-size: 14px;
+        font-weight: 500;
     }
 
     /* Alert Box */
     .alert-box {
-        padding: 14px 16px;
-        border-radius: 8px;
-        margin-bottom: 20px;
+        padding: 16px 20px;
+        border-radius: 12px;
+        margin-bottom: 24px;
         display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .alert-box.warning {
-        background: rgba(245, 158, 11, 0.1);
-        border: 1px solid rgba(245, 158, 11, 0.3);
-        color: #d97706;
+        align-items: flex-start;
+        gap: 12px;
+        border: 1.5px solid;
+        font-weight: 700;
+        font-size: 14px;
     }
 
     .alert-box.danger {
         background: rgba(239, 68, 68, 0.1);
-        border: 1px solid rgba(239, 68, 68, 0.3);
+        border-color: rgba(239, 68, 68, 0.3);
         color: #dc2626;
     }
 
+    .alert-box.warning {
+        background: rgba(245, 158, 11, 0.1);
+        border-color: rgba(245, 158, 11, 0.3);
+        color: #d97706;
+    }
+
     .alert-box i {
-        font-size: 20px;
+        font-size: 18px;
+        margin-top: 1px;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+        .ticket-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .ticket-container {
+            padding: 16px;
+        }
+
+        .ticket-header {
+            padding: 24px 20px;
+        }
+
+        .ticket-id-section h1 {
+            font-size: 26px;
+        }
+
+        .ticket-header-top {
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .ticket-meta {
+            grid-template-columns: 1fr;
+        }
+
+        .meta-chip {
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+
+        .btn-back, .btn-submit {
+            width: 100%;
+            justify-content: center;
+        }
     }
 </style>
 {% endblock %}
 
 {% block content %}
 
-<!-- Ticket Header -->
-<div class="ticket-header">
-    <div class="ticket-header-top">
-        <div class="ticket-id-section">
-            <h1>
-                <i class="fa-solid fa-ticket"></i>
-                <span class="ticket-number">#{{ T.ticket_no }}</span>
-            </h1>
-        </div>
-        <div>
-            <span class="status-badge-large status-{{ T.status|lower|replace(' ', '-') }}">
-                {{ T.status }}
-            </span>
-        </div>
-    </div>
+<div class="ticket-container">
 
-    <!-- Meta Information -->
-    <div class="ticket-meta">
-        <div class="meta-chip">
-            <i class="fa-solid fa-user"></i>
-            <span><strong>Created by:</strong> {{ T.user.name if T.user else 'Unknown' }}</span>
+    <!-- ✨ Ticket Header -->
+    <div class="ticket-header">
+        <div class="ticket-header-top">
+            <div class="ticket-id-section">
+                <h1>
+                    <i class="fa-solid fa-ticket"></i>
+                    <span class="ticket-number">#{{ T.ticket_no }}</span>
+                </h1>
+            </div>
+            <div>
+                <span class="status-badge-large status-{{ T.status|lower|replace(' ', '-') }}">
+                    {{ T.status }}
+                </span>
+            </div>
         </div>
 
-        <div class="meta-chip">
-            <i class="fa-solid fa-tag"></i>
-            <span><strong>Type:</strong> {{ T.ticket_type or 'N/A' }}</span>
-        </div>
-
-        <div class="meta-chip">
-            <i class="fa-solid fa-folder"></i>
-            <span><strong>Category:</strong> {{ T.category or 'Uncategorized' }}</span>
-        </div>
-
-        <div class="meta-chip">
-            <i class="fa-solid fa-flag"></i>
-            <span class="priority-badge priority-{{ T.priority|lower }}">{{ T.priority }}</span>
-        </div>
-
-        <div class="meta-chip">
-            <i class="fa-solid fa-clock"></i>
-            <span>{{ T.created_at.strftime("%b %d, %Y at %I:%M %p") if T.created_at else 'N/A' }}</span>
-        </div>
-
-        {% if T.due_date %}
-        <div class="meta-chip">
-            <i class="fa-solid fa-hourglass-half"></i>
-            <span><strong>Due:</strong> {{ T.due_date.strftime("%b %d, %Y at %I:%M %p") }}</span>
-        </div>
-        {% endif %}
-
-        {% if T.sla_state %}
-        <div class="meta-chip sla-{{ T.sla_state|lower|replace(' ', '-') }}">
-            <i class="fa-solid fa-shield-halved"></i>
-            <span><strong>SLA:</strong> {{ T.sla_state }}</span>
-        </div>
-        {% endif %}
-
-        {% if T.assignee or T.assignee_name %}
-        <div class="meta-chip">
-            <i class="fa-solid fa-user-check"></i>
-            <span><strong>Assigned to:</strong> 
-                {% if T.assignee %}
-                    {{ T.assignee.name }}
-                {% elif T.assignee_name %}
-                    {{ T.assignee_name }}
-                {% endif %}
-            </span>
-        </div>
-        {% endif %}
-    </div>
-
-    <!-- Description -->
-    <div class="ticket-description">
-        <span class="description-label">Description</span>
-        {{ T.description }}
-    </div>
-
-    <!-- Attachments -->
-    {% if attachments %}
-    <div class="attachments-section">
-        <span class="description-label">
-            <i class="fa-solid fa-paperclip"></i> Attachments ({{ attachments|length }})
-        </span>
-        <div class="attachments-grid">
-            {% for att in attachments %}
-            <a href="{{ url_for('uploaded_file', filename=att.filename) }}" 
-               class="attachment-item"
-               target="_blank">
-                <i class="fa-solid fa-file"></i>
-                <span>{{ att.filename }}</span>
-            </a>
-            {% endfor %}
-        </div>
-    </div>
-    {% endif %}
-</div>
-
-<!-- SLA Warning -->
-{% if T.sla_state == 'Breached' %}
-<div class="alert-box danger">
-    <i class="fa-solid fa-exclamation-triangle"></i>
-    <span><strong>SLA Breached:</strong> This ticket has exceeded its service level agreement deadline.</span>
-</div>
-{% elif T.sla_state == 'At Risk' %}
-<div class="alert-box warning">
-    <i class="fa-solid fa-clock"></i>
-    <span><strong>SLA At Risk:</strong> This ticket is approaching its deadline. Please take action soon.</span>
-</div>
-{% endif %}
-
-<!-- Update Panel (Admin/Assignee Only) -->
-{% if current_user.role in ["admin", "assignee"] %}
-<div class="update-panel">
-    <h2 class="panel-title">
-        <i class="fa-solid fa-pen-to-square"></i>
-        Update Ticket
-    </h2>
-
-    <form method="POST" enctype="multipart/form-data" id="updateForm">
-        
-        <!-- Admin-only: Assign To -->
-        {% if current_user.role == "admin" %}
-        <div class="form-group">
-            <label class="form-label" for="assignee">
-                <i class="fa-solid fa-user-plus"></i> Assign To
-            </label>
-            <select name="assignee_id" id="assignee" class="form-select">
-                <option value="">— Unassigned —</option>
-                {% for a in assignees %}
-                <option value="{{ a.id }}" {% if T.assignee_id == a.id %}selected{% endif %}>
-                    {{ a.name }} ({{ a.role|capitalize }})
-                </option>
-                {% endfor %}
-            </select>
-        </div>
-        {% endif %}
-
-        <!-- Status -->
-        <div class="form-group">
-            <label class="form-label" for="status">
-                <i class="fa-solid fa-circle-check"></i> Status
-            </label>
-            <select name="status" id="status" class="form-select">
-
-            {% if current_user.role == "admin" %}
-              <option value="Not Open Yet" {% if T.status=="Not Open Yet" %}selected{% endif %}>
-                  Not Open Yet
-              </option>
-            {% endif %}
-
-              <option value="Open" {% if T.status=="Open" %}selected{% endif %}>Open</option>
-              <option value="In Progress" {% if T.status=="In Progress" %}selected{% endif %}>In Progress</option>
-              <option value="Resolved" {% if T.status=="Resolved" %}selected{% endif %}>Resolved</option>
-              <option value="Closed" {% if T.status=="Closed" %}selected{% endif %}>Closed</option>
-
-            {% if current_user.role == "admin" %}
-                <option value="Re-Open" {% if T.status=="Re-Open" %}selected{% endif %}>
-                    Re-Open
-                </option>
-            {% endif %}
-
-            </select>
-
-        </div>
-
-        <!-- Admin-only: Priority -->
-        {% if current_user.role == "admin" %}
-        <div class="form-group">
-            <label class="form-label" for="priority">
-                <i class="fa-solid fa-flag"></i> Priority
-            </label>
-            <select name="priority" id="priority" class="form-select">
-                <option value="Low" {% if T.priority=="Low" %}selected{% endif %}>Low</option>
-                <option value="Medium" {% if T.priority=="Medium" %}selected{% endif %}>Medium</option>
-                <option value="High" {% if T.priority=="High" %}selected{% endif %}>High</option>
-                <option value="Critical" {% if T.priority=="Critical" %}selected{% endif %}>Critical</option>
-            </select>
-        </div>
-        {% endif %}
-
-        <!-- Attachment Upload -->
-        <div class="form-group">
-            <label class="form-label" for="attachment">
-                <i class="fa-solid fa-paperclip"></i> Upload Attachment
-            </label>
-            <input type="file" 
-                   name="attachment" 
-                   id="attachment" 
-                   class="form-control">
-        </div>
-
-        <!-- Comment/Message -->
-        <div class="form-group">
-            <label class="form-label" for="message">
-                <i class="fa-solid fa-comment"></i> Add Comment or Update
-            </label>
-            <textarea name="message" 
-                      id="message" 
-                      class="form-control"
-                      placeholder="Provide an update or add a comment..."></textarea>
-        </div>
-
-        <!-- Form Actions -->
-        <div class="form-actions">
-            <a href="{{ url_for('dashboard') }}" class="btn-back">
-                <i class="fa-solid fa-arrow-left"></i>
-                Back to Dashboard
-            </a>
-            <button type="submit" class="btn-submit" id="submitBtn">
-                <i class="fa-solid fa-paper-plane"></i>
-                Submit Update
-            </button>
-        </div>
-    </form>
-</div>
-{% endif %}
-
-<!-- Comments Section -->
-<div class="comments-section">
-    <h2 class="panel-title">
-        <i class="fa-solid fa-comments"></i>
-        Activity & Comments
-    </h2>
-
-    {% if comments %}
-    <div class="comments-list">
-        {% for c in comments %}
-        <div class="comment-item">
-            <div class="comment-header">
-                <div class="comment-author">
-                    <i class="fa-solid fa-user-circle"></i>
-                    {{ c.user.name if c.user else "System" }}
-                </div>
-                <div class="comment-time">
-                    {{ c.created_at.strftime("%b %d, %Y at %I:%M %p") if c.created_at else '' }}
+        <!-- Meta Information -->
+        <div class="ticket-meta">
+            <div class="meta-chip">
+                <i class="fa-solid fa-user"></i>
+                <div>
+                    <strong>Created By</strong>
+                    <span>{{ T.user.name if T.user else 'Unknown' }}</span>
                 </div>
             </div>
-            <p class="comment-text">{{ c.message }}</p>
+
+            <div class="meta-chip">
+                <i class="fa-solid fa-tag"></i>
+                <div>
+                    <strong>Type</strong>
+                    <span>{{ T.ticket_type or 'N/A' }}</span>
+                </div>
+            </div>
+
+            <div class="meta-chip">
+                <i class="fa-solid fa-folder"></i>
+                <div>
+                    <strong>Category</strong>
+                    <span>{{ T.category or 'Uncategorized' }}</span>
+                </div>
+            </div>
+
+            <div class="meta-chip">
+                <i class="fa-solid fa-flag"></i>
+                <div>
+                    <strong>Priority</strong>
+                    <span><span class="priority-badge priority-{{ T.priority|lower }}">{{ T.priority }}</span></span>
+                </div>
+            </div>
+
+            <div class="meta-chip">
+                <i class="fa-solid fa-calendar"></i>
+                <div>
+                    <strong>Created</strong>
+                    <span>{{ T.created_at.strftime("%b %d, %Y") if T.created_at else 'N/A' }}</span>
+                </div>
+            </div>
+
+            {% if T.assignee or T.assignee_name %}
+            <div class="meta-chip">
+                <i class="fa-solid fa-user-check"></i>
+                <div>
+                    <strong>Assigned To</strong>
+                    <span>{% if T.assignee %}{{ T.assignee.name }}{% elif T.assignee_name %}{{ T.assignee_name }}{% endif %}</span>
+                </div>
+            </div>
+            {% endif %}
         </div>
-        {% endfor %}
+
+        <!-- Description -->
+        <div class="ticket-description">
+            <span class="description-label">Description</span>
+            {{ T.description }}
+        </div>
     </div>
-    {% else %}
-    <div class="empty-state">
-        <i class="fa-solid fa-comments"></i>
-        <p>No comments or activity yet.</p>
+
+    <!-- SLA Alerts -->
+    {% if T.sla_state == 'Breached' %}
+    <div class="alert-box danger">
+        <i class="fa-solid fa-exclamation-triangle"></i>
+        <span><strong>SLA Breached:</strong> This ticket has exceeded its service level agreement deadline. Immediate action required.</span>
+    </div>
+    {% elif T.sla_state == 'At Risk' %}
+    <div class="alert-box warning">
+        <i class="fa-solid fa-clock"></i>
+        <span><strong>SLA At Risk:</strong> This ticket is approaching its deadline ({{ T.sla_countdown_human }}). Please prioritize.</span>
     </div>
     {% endif %}
+
+    <!-- ✨ Main Grid -->
+    <div class="ticket-grid">
+
+        <!-- Comments Section -->
+        <div class="comments-section">
+            <h2 class="section-title">
+                <i class="fa-solid fa-comments"></i>
+                Activity & Comments
+            </h2>
+
+            {% if comments %}
+            {% for c in comments %}
+            <div class="comment-item">
+                <div class="comment-header">
+                    <div class="comment-author">
+                        <i class="fa-solid fa-user-circle"></i>
+                        {{ c.user.name if c.user else 'System' }}
+                    </div>
+                    <div class="comment-time">
+                        {{ c.created_at.strftime("%b %d, %Y at %I:%M %p") if c.created_at else '' }}
+                    </div>
+                </div>
+                <p class="comment-text">{{ c.message }}</p>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="empty-state">
+                <i class="fa-solid fa-comments"></i>
+                <p>No comments yet. Be the first to add an update.</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Sidebar -->
+        <aside>
+            <!-- Quick Info -->
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">
+                    <i class="fa-solid fa-info-circle"></i>
+                    Details
+                </h3>
+                <div class="sidebar-info">
+                    {% if T.due_date %}
+                    <div class="info-row">
+                        <strong>Due Date</strong>
+                        <span>{{ T.due_date.strftime("%b %d, %Y at %I:%M %p") }}</span>
+                    </div>
+                    {% endif %}
+
+                    {% if T.sla_state %}
+                    <div class="info-row">
+                        <strong>SLA Status</strong>
+                        <span style="font-weight: 800; color: {% if T.sla_state == 'Met' %}#10b981{% elif T.sla_state == 'At Risk' %}#f59e0b{% else %}#ef4444{% endif %};">
+                            {{ T.sla_state }}
+                        </span>
+                    </div>
+                    {% endif %}
+
+                    {% if T.sla_countdown_human %}
+                    <div class="info-row">
+                        <strong>SLA Countdown</strong>
+                        <span>{{ T.sla_countdown_human }}</span>
+                    </div>
+                    {% endif %}
+
+                    <div class="info-row">
+                        <strong>Status</strong>
+                        <span>{{ T.status }}</span>
+                    </div>
+
+                    <div class="info-row">
+                        <strong>Aging</strong>
+                        <span>{{ T.aging }} day{{ 's' if T.aging != 1 else '' }}</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- ✨ Update Section (Admin/Assignee Only) -->
+    {% if current_user.role in ["admin", "assignee"] %}
+    <div class="update-section">
+        <h2 class="section-title">
+            <i class="fa-solid fa-pen-to-square"></i>
+            Update Ticket
+        </h2>
+
+        <form method="POST" enctype="multipart/form-data" id="updateForm">
+
+            <!-- Status -->
+            <div class="form-group">
+                <label class="form-label" for="status">
+                    <i class="fa-solid fa-circle-check"></i>
+                    Status
+                </label>
+                <select name="status" id="status" class="form-select">
+                    {% if current_user.role == "admin" %}
+                    <option value="Not Open Yet" {% if T.status=="Not Open Yet" %}selected{% endif %}>Not Open Yet</option>
+                    {% endif %}
+                    <option value="Open" {% if T.status=="Open" %}selected{% endif %}>Open</option>
+                    <option value="In Progress" {% if T.status=="In Progress" %}selected{% endif %}>In Progress</option>
+                    <option value="Resolved" {% if T.status=="Resolved" %}selected{% endif %}>Resolved</option>
+                    <option value="Closed" {% if T.status=="Closed" %}selected{% endif %}>Closed</option>
+                    {% if current_user.role == "admin" %}
+                    <option value="Re-Open" {% if T.status=="Re-Open" %}selected{% endif %}>Re-Open</option>
+                    {% endif %}
+                </select>
+            </div>
+
+            <!-- Comment -->
+            <div class="form-group">
+                <label class="form-label" for="message">
+                    <i class="fa-solid fa-comment"></i>
+                    Add Comment
+                </label>
+                <textarea name="message" 
+                          id="message" 
+                          class="form-control"
+                          placeholder="Add an update or comment about this ticket..."></textarea>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="form-actions">
+                <a href="{{ url_for('user_dashboard') }}" class="btn-back">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Back to Dashboard
+                </a>
+                <button type="submit" class="btn-submit" id="submitBtn">
+                    <i class="fa-solid fa-paper-plane"></i>
+                    Submit Update
+                </button>
+            </div>
+        </form>
+    </div>
+    {% endif %}
+
 </div>
 
 {% endblock %}
@@ -664,55 +795,29 @@
     const submitBtn = document.getElementById('submitBtn');
 
     if (form) {
-        // Form validation
         form.addEventListener('submit', function(e) {
             const message = document.getElementById('message').value.trim();
             const status = document.getElementById('status').value;
-            const attachment = document.getElementById('attachment').files.length;
 
-            // Check if any changes were made
-            const hasChanges = message || 
-                              status !== '{{ T.status }}' || 
-                              attachment > 0 ||
-                              {% if current_user.role == "admin" %}
-                              document.getElementById('assignee').value !== '{{ T.assignee_id if T.assignee_id else "" }}' ||
-                              document.getElementById('priority').value !== '{{ T.priority }}'
-                              {% else %}
-                              false
-                              {% endif %};
-
-            if (!hasChanges) {
+            if (!message && status === '{{ T.status }}') {
                 e.preventDefault();
-                window.showToast('No changes detected', 'info');
+                window.showToast('Please add a comment or change the status', 'info');
                 return;
             }
 
-            // Add loading state
+            if (status === 'Closed') {
+                const confirmed = confirm('Are you sure you want to close this ticket?');
+                if (!confirmed) {
+                    e.preventDefault();
+                    return;
+                }
+            }
+
             if (submitBtn) {
                 submitBtn.disabled = true;
-                submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting...';
             }
         });
-
-        // Confirmation for closing ticket
-        const statusSelect = document.getElementById('status');
-        if (statusSelect) {
-            statusSelect.addEventListener('change', function() {
-                if (this.value === 'Closed') {
-                    const confirmed = confirm('Are you sure you want to close this ticket? This will mark it as resolved.');
-                    if (!confirmed) {
-                        this.value = '{{ T.status }}';
-                    }
-                }
-            });
-        }
     }
-
-    // Auto-scroll to comments if hash present
-    if (window.location.hash === '#comments') {
-        document.querySelector('.comments-section').scrollIntoView({ behavior: 'smooth' });
-    }
-
 })();
 </script>
 {% endblock %}

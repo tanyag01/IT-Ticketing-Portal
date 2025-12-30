@@ -120,7 +120,7 @@
       filter: brightness(1.5);
     }
 
-    /* Topbar */
+    /* ✨ Topbar - Modern Design */
     .topbar {
       height: 70px;
       display: flex;
@@ -133,6 +133,7 @@
       top: 0;
       z-index: 100;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      gap: 20px;
     }
 
     .brand {
@@ -143,6 +144,7 @@
       align-items: center;
       gap: 14px;
       letter-spacing: -0.03em;
+      text-decoration: none;
     }
 
     .brand-logo {
@@ -160,6 +162,12 @@
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
       overflow: hidden;
       border: 2px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.3s ease;
+    }
+
+    .brand-logo:hover {
+      transform: scale(1.05);
+      background: rgba(255, 255, 255, 0.2);
     }
 
     .brand-logo img {
@@ -173,6 +181,7 @@
       display: flex;
       align-items: center;
       gap: 14px;
+      margin-left: auto;
     }
 
     .theme-btn, .notification-bell {
@@ -380,7 +389,7 @@
       opacity: 1;
     }
 
-    /* Sidebar - Modern Design */
+    /* ✨ Sidebar - Modern Design */
     .sidebar {
       width: 280px;
       position: fixed;
@@ -440,7 +449,13 @@
       font-size: 18px;
     }
 
-    /* Main Content */
+    .sidebar hr {
+      border: none;
+      border-top: 1px solid var(--border-final);
+      margin: 24px 0;
+    }
+
+    /* ✨ Main Content */
     .main-content {
       margin-left: 280px;
       padding: 28px;
@@ -450,7 +465,7 @@
       z-index: 1;
     }
 
-    /* Card */
+    /* ✨ Card */
     .card {
       background: var(--bg-card-final);
       border-radius: var(--card-radius);
@@ -466,7 +481,7 @@
       transform: translateY(-2px);
     }
 
-    /* Forms */
+    /* ✨ Forms */
     .form-control,
     .form-select {
       background: var(--bg-card-final) !important;
@@ -497,7 +512,7 @@
       font-size: 14px;
     }
 
-    /* Buttons */
+    /* ✨ Buttons */
     .btn-primary {
       background: linear-gradient(135deg, var(--brand), #1e3a8a);
       border: none;
@@ -512,9 +527,26 @@
       background: linear-gradient(135deg, #1e3a8a, var(--brand));
       transform: translateY(-2px);
       box-shadow: 0 6px 16px rgba(30, 64, 175, 0.4);
+      color: white;
     }
 
-    /* Alerts */
+    .btn-secondary {
+      background: var(--bg-surface);
+      border: 1.5px solid var(--border-final);
+      color: var(--text-main);
+      font-weight: 600;
+      padding: 12px 24px;
+      border-radius: 10px;
+      transition: all 0.3s ease;
+    }
+
+    .btn-secondary:hover {
+      background: var(--border-final);
+      border-color: var(--text-main);
+      transform: translateY(-2px);
+    }
+
+    /* ✨ Alerts */
     .alert {
       border-radius: 12px;
       border-left: 4px solid;
@@ -540,7 +572,19 @@
       border-color: #ef4444;
     }
 
-    /* Tables */
+    .alert-warning {
+      background: #fef3c7;
+      color: #92400e;
+      border-color: #f59e0b;
+    }
+
+    .alert-info {
+      background: #dbeafe;
+      color: #1e40af;
+      border-color: #3b82f6;
+    }
+
+    /* ✨ Tables */
     .table {
       color: var(--text-main);
       margin-bottom: 0;
@@ -571,7 +615,7 @@
       background: rgba(30, 64, 175, 0.04);
     }
 
-    /* Footer - Professional Design */
+    /* ✨ Footer - Professional Design */
     footer {
       background: var(--bg-card-final);
       border-top: 2px solid var(--border-final);
@@ -606,7 +650,7 @@
       text-decoration: underline;
     }
 
-    /* User info in topbar */
+    /* ✨ User info in topbar */
     .user-info {
       display: flex;
       align-items: center;
@@ -624,7 +668,7 @@
       color: rgba(255, 255, 255, 0.9);
     }
 
-    /* Toast */
+    /* ✨ Toast */
     #toast {
       position: fixed;
       right: 28px;
@@ -639,11 +683,11 @@
       border: 1px solid var(--border-final);
       min-width: 280px;
       font-weight: 500;
+      animation: toastSlide 2.8s ease forwards;
     }
 
     #toast.show {
       display: block;
-      animation: toastSlide 2.8s ease forwards;
     }
 
     @keyframes toastSlide {
@@ -653,7 +697,7 @@
       100% { opacity: 0; transform: translateY(30px); }
     }
 
-    /* Scrollbar styling */
+    /* ✨ Scrollbar styling */
     ::-webkit-scrollbar {
       width: 12px;
       height: 12px;
@@ -673,7 +717,7 @@
       background: var(--text-muted-final);
     }
 
-    /* Mobile */
+    /* ✨ Mobile Responsive */
     @media (max-width: 900px) {
       .sidebar {
         transform: translateX(-100%);
@@ -686,6 +730,7 @@
 
       .main-content {
         margin-left: 0 !important;
+        padding: 20px;
       }
 
       .brand span {
@@ -711,12 +756,28 @@
         display: block !important;
       }
     }
+
+    @media (max-width: 480px) {
+      .main-content {
+        padding: 16px;
+      }
+
+      footer {
+        padding: 18px 16px;
+        font-size: 12px;
+      }
+
+      .card {
+        padding: 20px;
+        margin-bottom: 20px;
+      }
+    }
   </style>
 </head>
 
 <body>
 
-  <!-- Topbar -->
+  <!-- ✨ Topbar -->
   <nav class="topbar" role="navigation" aria-label="Topbar">
     <div class="d-flex align-items-center gap-3">
       {% if current_user.is_authenticated %}
@@ -724,19 +785,19 @@
         <i class="fa-solid fa-bars"></i>
       </button>
       {% endif %}
-      <div class="brand" aria-label="IT Ticketing Portal">
+      <a href="/" class="brand" aria-label="IT Ticketing Portal">
         <div class="brand-logo">
           <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
           <span style="display: none;">⚙️</span>
         </div>
         <span>IT Ticketing Portal</span>
-      </div>
+      </a>
     </div>
 
     <div class="topbar-controls">
       {% if current_user.is_authenticated %}
       
-      <!-- Notification Bell -->
+      <!-- ✨ Notification Bell -->
       <div style="position: relative;">
         <button id="notificationBell" class="notification-bell" aria-label="Notifications" title="Notifications">
           <i class="fa-solid fa-bell"></i>
@@ -758,18 +819,18 @@
         </div>
       </div>
 
-      <!-- Theme Toggle -->
+      <!-- ✨ Theme Toggle -->
       <button id="themeToggle" class="theme-btn" aria-label="Toggle theme" title="Toggle theme">
         🌙
       </button>
 
-      <!-- User Info -->
+      <!-- ✨ User Info -->
       <span class="user-info d-none d-sm-flex">
         <i class="fa-solid fa-user-circle"></i>
         <span>{{ current_user.name }}</span>
       </span>
 
-      <!-- Logout -->
+      <!-- ✨ Logout -->
       <a href="{{ url_for('logout') }}" class="theme-btn" title="Logout" aria-label="Logout">
         <i class="fa-solid fa-right-from-bracket"></i>
       </a>
@@ -780,7 +841,7 @@
     </div>
   </nav>
 
-  <!-- Sidebar -->
+  <!-- ✨ Sidebar -->
   {% if current_user.is_authenticated %}
   <aside id="sidebar" class="sidebar" role="navigation" aria-label="Main navigation">
     {% if current_user.role == 'admin' %}
@@ -801,7 +862,7 @@
       <span>Reports</span>
     </a>
     <a href="{{ url_for('settings') }}" class="{{ 'active' if request.endpoint == 'settings' else '' }}">
-      <i class="fa-solid fa-envelope"></i>
+      <i class="fa-solid fa-gear"></i>
       <span>Settings</span>
     </a>
     {% else %}
@@ -814,12 +875,12 @@
       <span>Raise Ticket</span>
     </a>
     <a href="{{ url_for('settings') }}" class="{{ 'active' if request.endpoint == 'settings' else '' }}">
-      <i class="fa-solid fa-envelope"></i>
+      <i class="fa-solid fa-gear"></i>
       <span>Settings</span>
     </a>
     {% endif %}
 
-    <hr style="opacity: 0.2; margin: 24px 0;">
+    <hr>
 
     <a href="{{ url_for('logout') }}">
       <i class="fa-solid fa-right-from-bracket"></i>
@@ -828,7 +889,7 @@
   </aside>
   {% endif %}
 
-  <!-- Main Content -->
+  <!-- ✨ Main Content -->
   <main id="mainContent" class="main-content" role="main">
     <!-- Flash Messages -->
     {% with messages = get_flashed_messages(with_categories=true) %}
@@ -855,21 +916,21 @@
     {% block content %}{% endblock %}
   </main>
 
-  <!-- Footer -->
+  <!-- ✨ Footer -->
   <footer>
     <p style="font-weight: 600; font-size: 15px;">© 2025 IT Ticketing Portal. All rights reserved.</p>
     <p>Designed & Developed with <i class="fa-solid fa-heart" style="color: #ef4444;"></i> by <a href="#">Tanya Gupta</a></p>
   </footer>
 
-  <!-- Toast Notification -->
+  <!-- ✨ Toast Notification -->
   <div id="toast" role="status" aria-live="polite"></div>
 
-  <!-- Core Scripts -->
+  <!-- ✨ Core Scripts -->
   <script>
     (function () {
       'use strict';
 
-      // Theme management
+      // ✨ Theme management
       const metaEl = document.querySelector("meta[name='user-theme']");
       const metaUser = metaEl ? metaEl.content : "";
       const stored = localStorage.getItem("theme");
@@ -897,7 +958,7 @@
         });
       }
 
-      // Sidebar toggle
+      // ✨ Sidebar toggle
       const side = document.getElementById("sidebar");
       const main = document.getElementById("mainContent");
       const sidebarToggle = document.getElementById("sidebarToggle");
@@ -922,7 +983,7 @@
         });
       }
 
-      // Toast functionality
+      // ✨ Toast functionality
       window.showToast = function(msg, type = 'info') {
         const t = document.getElementById("toast");
         if (!t) return;
@@ -939,7 +1000,7 @@
         setTimeout(() => t.classList.remove("show"), 2800);
       };
 
-      // Auto-dismiss alerts
+      // ✨ Auto-dismiss alerts
       setTimeout(() => {
         const alerts = document.querySelectorAll('.alert:not(.alert-permanent)');
         alerts.forEach(alert => {
@@ -950,7 +1011,7 @@
     })();
   </script>
 
-  <!-- Notification System with Persistence Fix -->
+  <!-- ✨ Notification System with Persistence Fix -->
   <script>
     // Close notification dropdown
     function closeNotificationDropdown() {

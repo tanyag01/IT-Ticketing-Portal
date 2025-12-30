@@ -1838,3 +1838,71 @@ a:hover {
     }
 }
 
+/* =================================================
+   AUTH / LANDING PAGE BACKGROUND
+================================================= */
+.auth-page {
+    min-height: 100vh;
+    background:
+        linear-gradient(
+            135deg,
+            rgba(30, 64, 175, 0.75),
+            rgba(30, 64, 175, 0.65)
+        ),
+        url("/backend/static/images/it-bg.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 16px;
+    position: relative;
+}
+
+/* Fallback solid background if image doesn't load */
+.auth-page::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+    z-index: -2;
+}
+
+/* Login Card */
+.auth-card {
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 48px 44px;
+    max-width: 560px;
+    width: 100%;
+    text-align: center;
+    position: relative;
+    z-index: 10;
+
+    box-shadow:
+        0 10px 30px rgba(0, 0, 0, 0.3),
+        0 30px 80px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Heading */
+.auth-card h1 {
+    color: #1e40af;
+    font-weight: 700;
+    margin-bottom: 16px;
+    letter-spacing: -0.02em;
+}
+
+/* Description text */
+.auth-card p {
+    color: #475569;
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 32px;
+}

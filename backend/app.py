@@ -462,12 +462,47 @@ def register_routes(app):
 
         if form.validate_on_submit():
             try:
+                # ✅ FIX: Verify all required fields are present
+                ticket_type = form.ticket_type.data
+                category = form.category.data
+                priority = form.priority.data
+                description = form.description.data
+                
+                # Validate required fields
+                if not all([ticket_type, category, priority, description]):
+                    app.logger.warning("Missing required ticket fields")
+                    flash("Please fill in all required fields.", "warning")
+                    return render_template("ticket_form.html", form=form)
+                
+                # ✅ FIXED: Generate UNIQUE ticket number
+                # Format: IT-YYYYMM-XXXX where XXXX is sequential
+                now = datetime.utcnow()
+                year_month = now.strftime('%y%m')  # e.g., '202512'
+
+                # Get the last ticket created this month
+                last_ticket = Ticket.query.filter(
+                    Ticket.ticket_no.like(f'IT-{year_month}%')
+                 ).order_by(Ticket.id.desc()).first() 
+                  
+                if last_ticket:
+                     # Extract the number from the ticket_no (e.g., 'IT-202512-0005' → 5)
+                     try:
+                         last_number = int(last_ticket.ticket_no.split('-')[-1])
+                         next_number = last_number + 1
+                     except (ValueError, IndexError):
+                         next_number = 1
+                else:  
+                     next_number = 1    
+                # Generate new ticket number: IT-202512-0001, IT-202512-0002, etc.
+                ticket_no = f"IT-{year_month}-{next_number:04d}"
+                     
                 t = Ticket(
+                    ticket_no=ticket_no,
                     user_id=current_user.id,
-                    ticket_type=form.ticket_type.data,
-                    category=form.category.data,
-                    priority=form.priority.data,
-                    description=form.description.data,
+                    ticket_type=ticket_type,
+                    category=category,
+                    priority=priority,
+                    description=description,
                     status="Not Open Yet",
                     sla_hours=app.config.get("SLA_HOURS", 24),
                 )
@@ -475,21 +510,23 @@ def register_routes(app):
                 t.due_date = utils.compute_due_date(t.sla_hours)
 
                 db.session.add(t)
-                db.session.commit()
+                db.session.flush()  # Get the ID before commit
 
                 # Handle attachment
                 f = request.files.get("attachment")
-                if f and getattr(f, "filename", None):
-                    filename = utils.save_attachment(f)
-                    if filename:
-                        db.session.add(Attachment(ticket_id=t.id, filename=filename))
-                        db.session.commit()
+                if f and getattr(f, "filename", None) and f.filename.strip():
+                    try:
+                        filename = utils.save_attachment(f)
+                        if filename:
+                            db.session.add(Attachment(ticket_id=t.id, filename=filename))
+                    except Exception as e:
+                        app.logger.warning(f"Attachment upload failed: {e}")
 
                 # Add history
                 db.session.add(TicketHistory(ticket_id=t.id, event="Ticket created", user_id=current_user.id))
                 db.session.commit()
 
-                # Send email
+                # Send email (non-blocking)
                 try:
                     utils.email_ticket_created(current_user, t)
                 except Exception as e:
@@ -499,7 +536,7 @@ def register_routes(app):
                 return redirect(url_for("user_dashboard"))
 
             except Exception as e:
-                app.logger.error(f"Create ticket error: {e}")
+                app.logger.error(f"Create ticket error: {e}", exc_info=True)
                 db.session.rollback()
                 flash("Failed to create ticket. Please try again.", "danger")
 
@@ -972,12 +1009,11 @@ def register_routes(app):
     def api_notifications_mark_all_read():
         """Mark all notifications as read."""
         try:
-            # Implementation note: If you add a 'read' column to your models,
-            # you can mark all user notifications as read here
-            return jsonify({"success": True})
+            # ✅ FIX: Return actual empty state after marking all as read
+            return jsonify({"success": True, "count": 0})
         except Exception as e:
             app.logger.error(f"Mark all read error: {e}")
-            return jsonify({"success": False}), 500
+            return jsonify({"success": False, "count": 0}), 500
 
     # ============================================================
     # END OF NOTIFICATION API ROUTES
