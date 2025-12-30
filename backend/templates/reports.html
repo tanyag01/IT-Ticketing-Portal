@@ -186,18 +186,32 @@
         border-bottom: 2px solid var(--border-final);
     }
 
-    .table-title {
-        font-size: 18px;
-        font-weight: 600;
-        color: var(--text-main);
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
+    /* Fix for Detailed Report heading visibility in both light and dark modes */
 
-    .table-title i {
-        color: var(--brand);
-    }
+/* Light Mode */
+[data-theme="light"] .table-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #0f172a !important;  /* Dark color for light mode */
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Dark Mode */
+[data-theme="dark"] .table-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #f1f5f9 !important;  /* Light color for dark mode */
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Icon color for both modes */
+.table-title i {
+    color: var(--brand);
+}
 
     /* Table */
     .table-responsive {

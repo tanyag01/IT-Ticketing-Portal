@@ -17,6 +17,12 @@
         display: none !important;
     }
 
+    /* Override topbar color for register page to green */
+    .topbar {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+
     /* ✨ Register Container with Split Design */
     .register-container {
         min-height: calc(100vh - 75px);
@@ -28,9 +34,11 @@
         overflow: hidden;
     }
 
-    /* Left Side - Branding & Benefits */
+    /* Left Side - Branding & Benefits WITH BACKGROUND IMAGE */
     .register-left {
-        background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.85) 0%, rgba(5, 150, 105, 0.85) 50%, rgba(4, 120, 87, 0.85) 100%),
+                    url("/static/images/it-bg.jpg") center/cover;
+        background-attachment: fixed;
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -169,6 +177,7 @@
         align-items: center;
         padding: 60px 40px;
         position: relative;
+        overflow-y: auto;
     }
 
     .register-right::before {
@@ -254,16 +263,6 @@
         z-index: 1;
     }
 
-    .form-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 16px;
-    }
-
-    .form-row.full {
-        grid-template-columns: 1fr;
-    }
-
     .form-group {
         margin-bottom: 20px;
     }
@@ -296,7 +295,7 @@
         border: 1.5px solid #cbd5e1;
         border-radius: 12px;
         background: #f8fafc;
-        color: #64748b;
+        color: #0f172a;
         font-size: 14px;
         transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         font-family: inherit;
@@ -431,7 +430,7 @@
         75% { transform: translateX(5px); }
     }
 
-    /* ✨ Submit Button */
+    /* ✨ Submit Button - NO Animation */
     .btn-submit {
         width: 100%;
         padding: 14px;
@@ -449,29 +448,12 @@
         gap: 10px;
         margin-top: 24px;
         box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
-        position: relative;
-        overflow: hidden;
-    }
-
-    .btn-submit::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
-        transition: left 0.5s ease;
     }
 
     .btn-submit:hover:not(:disabled) {
         background: linear-gradient(135deg, #059669, #047857);
         transform: translateY(-3px);
         box-shadow: 0 12px 28px rgba(16, 185, 129, 0.4);
-    }
-
-    .btn-submit:hover:not(:disabled)::before {
-        left: 100%;
     }
 
     .btn-submit:active:not(:disabled) {
@@ -489,24 +471,6 @@
 
     .btn-submit:hover:not(:disabled) i {
         transform: translateX(4px);
-    }
-
-    .spinner {
-        display: none;
-        width: 18px;
-        height: 18px;
-        border: 2px solid rgba(255, 255, 255, 0.3);
-        border-top-color: white;
-        border-radius: 50%;
-        animation: spin 0.8s linear infinite;
-    }
-
-    .btn-submit.loading .spinner {
-        display: inline-block;
-    }
-
-    @keyframes spin {
-        to { transform: rotate(360deg); }
     }
 
     /* Alert Styling */
@@ -552,6 +516,12 @@
         background: #fee2e2;
         color: #991b1b;
         border-color: #ef4444;
+    }
+
+    .alert-warning {
+        background: #fef3c7;
+        color: #92400e;
+        border-color: #f59e0b;
     }
 
     /* ✨ Terms Notice */
@@ -629,10 +599,6 @@
 
         .register-card {
             max-width: 100%;
-        }
-
-        .form-row {
-            grid-template-columns: 1fr;
         }
     }
 
@@ -807,7 +773,7 @@
                     </div>
                     <div class="password-hint">
                         <i class="fa-solid fa-check"></i>
-                        At least 8 characters, letters & numbers
+                        At least 8 characters, 1 uppercase, 1 number
                     </div>
                     {% if form.password.errors %}
                         {% for error in form.password.errors %}
@@ -819,9 +785,32 @@
                     {% endif %}
                 </div>
 
+                <!-- Confirm Password Field -->
+                <div class="form-group">
+                    <label class="form-label" for="password_confirm">
+                        <i class="fa-solid fa-lock"></i>
+                        <span style="font-weight: 800; color: #0f172a;">Confirm Password</span>
+                        <span class="required">*</span>
+                    </label>
+                    {{ form.password_confirm(
+                        class="form-control",
+                        id="password_confirm",
+                        placeholder="Confirm your password",
+                        required=True,
+                        autocomplete="new-password"
+                    ) }}
+                    {% if form.password_confirm.errors %}
+                        {% for error in form.password_confirm.errors %}
+                            <div class="error-message">
+                                <i class="fa-solid fa-exclamation-circle"></i>
+                                {{ error }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
                 <!-- Submit Button -->
                 <button type="submit" class="btn-submit" id="submitBtn">
-                    <span class="spinner"></span>
                     <i class="fa-solid fa-user-check"></i>
                     <span>Create Account</span>
                 </button>
@@ -858,6 +847,7 @@
     const nameField = document.getElementById('name');
     const emailField = document.getElementById('email');
     const passwordField = document.getElementById('password');
+    const confirmPasswordField = document.getElementById('password_confirm');
     const togglePasswordBtn = document.getElementById('togglePassword');
     const toggleIcon = togglePasswordBtn.querySelector('i');
     const strengthIndicator = document.getElementById('passwordStrength');
@@ -868,10 +858,12 @@
         e.preventDefault();
         if (passwordField.type === 'password') {
             passwordField.type = 'text';
+            confirmPasswordField.type = 'text';
             toggleIcon.classList.remove('fa-eye');
             toggleIcon.classList.add('fa-eye-slash');
         } else {
             passwordField.type = 'password';
+            confirmPasswordField.type = 'password';
             toggleIcon.classList.remove('fa-eye-slash');
             toggleIcon.classList.add('fa-eye');
         }
@@ -900,12 +892,14 @@
         if (strength <= 1) {
             strengthBar.classList.add('strength-weak');
             this.classList.add('is-invalid');
+            this.classList.remove('is-valid');
         } else if (strength <= 2) {
             strengthBar.classList.add('strength-medium');
             this.classList.remove('is-invalid');
         } else {
             strengthBar.classList.add('strength-strong');
             this.classList.add('is-valid');
+            this.classList.remove('is-invalid');
         }
     });
 
@@ -924,12 +918,14 @@
         }
     });
 
-    // ✨ Form validation
+    // ✨ Form validation before submit
     form.addEventListener('submit', function(e) {
         const name = nameField.value.trim();
         const email = emailField.value.trim();
         const password = passwordField.value;
+        const confirmPassword = confirmPasswordField.value;
 
+        // Validate name
         if (!name || name.length < 2) {
             e.preventDefault();
             window.showToast('Please enter your full name (at least 2 characters)', 'warning');
@@ -937,6 +933,7 @@
             return;
         }
 
+        // Validate email
         if (!email) {
             e.preventDefault();
             window.showToast('Please enter your email address', 'warning');
@@ -952,6 +949,7 @@
             return;
         }
 
+        // Validate password
         if (!password || password.length < 8) {
             e.preventDefault();
             window.showToast('Password must be at least 8 characters', 'warning');
@@ -959,19 +957,36 @@
             return;
         }
 
-        if (!password.match(/[a-zA-Z]/) || !password.match(/[0-9]/)) {
+        // Check password has uppercase
+        if (!password.match(/[A-Z]/)) {
             e.preventDefault();
-            window.showToast('Password must contain both letters and numbers', 'warning');
+            window.showToast('Password must contain at least one uppercase letter', 'warning');
             passwordField.focus();
             return;
         }
 
-        submitBtn.classList.add('loading');
+        // Check password has number
+        if (!password.match(/[0-9]/)) {
+            e.preventDefault();
+            window.showToast('Password must contain at least one number', 'warning');
+            passwordField.focus();
+            return;
+        }
+
+        // Check passwords match
+        if (password !== confirmPassword) {
+            e.preventDefault();
+            window.showToast('Passwords do not match', 'warning');
+            confirmPasswordField.focus();
+            return;
+        }
+
+        // All validations passed, allow submission
         submitBtn.disabled = true;
     });
 
     // ✨ Clear validation on input
-    [nameField, emailField, passwordField].forEach(field => {
+    [nameField, emailField, passwordField, confirmPasswordField].forEach(field => {
         field.addEventListener('input', function() {
             this.classList.remove('is-valid', 'is-invalid');
         });
@@ -995,14 +1010,6 @@
 
     // Auto-focus first field
     nameField.focus();
-
-    // Reset loading state on page load
-    window.addEventListener('load', function() {
-        if (submitBtn) {
-            submitBtn.classList.remove('loading');
-            submitBtn.disabled = false;
-        }
-    });
 
 })();
 </script>

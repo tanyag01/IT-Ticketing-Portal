@@ -180,13 +180,14 @@ class RegisterForm(FlaskForm):
         render_kw={"placeholder": "John Smith", "class": "form-control"}
     )
     
+    # Note: Email uniqueness is checked in the route, not here to avoid database hits during form validation
+
     email = StringField(
-        "Email",
+        "Email Address",
         validators=[
             InputRequired(message="Email is required"),
-            Email(message="Invalid email address"),
-            Length(max=180),
-            email_exists
+            Email(message="Please enter a valid email address"),
+            Length(min=5, max=180, message="Email must be between 5 and 180 characters")
         ],
         render_kw={"placeholder": "your@email.com", "class": "form-control"}
     )
@@ -210,7 +211,7 @@ class RegisterForm(FlaskForm):
         render_kw={"placeholder": "Confirm your password", "class": "form-control"}
     )
     
-    submit = SubmitField("Register", render_kw={"class": "btn btn-primary w-100"})
+    submit = SubmitField('Create Account', render_kw={"class": "btn-submit"})
 
 
 class ChangePasswordForm(FlaskForm):
